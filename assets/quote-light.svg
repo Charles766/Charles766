@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 170" width="780" height="170" role="img">
+  <title>引语</title>
+  <desc>四句格言依次淡入淡出，各附一句中文。</desc>
+  <style>
+    .qa { animation: qa 24s ease-in-out infinite; }
+    .qb { animation: qb 24s ease-in-out infinite; }
+    .qc { animation: qc 24s ease-in-out infinite; }
+    .qd { animation: qd 24s ease-in-out infinite; }
+    @keyframes qa {
+      0% { opacity: 1; }
+      23% { opacity: 1; }
+      25% { opacity: 0; }
+      98% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes qb {
+      0% { opacity: 0; }
+      23% { opacity: 0; }
+      25% { opacity: 1; }
+      48% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes qc {
+      0% { opacity: 0; }
+      48% { opacity: 0; }
+      50% { opacity: 1; }
+      73% { opacity: 1; }
+      75% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+    @keyframes qd {
+      0% { opacity: 0; }
+      73% { opacity: 0; }
+      75% { opacity: 1; }
+      98% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  </style>
+
+  <g class="qa" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" text-anchor="middle">
+    <text x="390" y="46" font-size="14.5" letter-spacing="0.3" fill="#7B5FC4">𝓦𝓱𝓪𝓽 𝔂𝓸𝓾 𝓪𝓻𝓮 𝔂𝓸𝓾 𝓭𝓸 𝓷𝓸𝓽 𝓼𝓮𝓮, 𝔀𝓱𝓪𝓽 𝔂𝓸𝓾 𝓼𝓮𝓮 𝓲𝓼 𝔂𝓸𝓾𝓻 𝓼𝓱𝓪𝓭𝓸𝔀.</text>
+    <text x="390" y="76" font-size="20" fill="#C4567C">﹏</text>
+    <text x="390" y="108" font-size="15" letter-spacing="1.5" fill="#6E6377">世人难窥本真，目之所及，仅是浮影。</text>
+    <text x="390" y="138" font-size="14" fill="#B3A8B9">⋆</text>
+  </g>
+
+  <g class="qb" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" text-anchor="middle">
+    <text x="390" y="46" font-size="14.5" letter-spacing="0.3" fill="#7B5FC4">𝓦𝓮 𝓬𝓸𝓶𝓮 𝓷𝓮𝓪𝓻𝓮𝓼𝓽 𝓽𝓸 𝓽𝓱𝓮 𝓰𝓻𝓮𝓪𝓽 𝔀𝓱𝓮𝓷 𝔀𝓮 𝓪𝓻𝓮 𝓰𝓻𝓮𝓪𝓽 𝓲𝓷 𝓱𝓾𝓶𝓲𝓵𝓲𝓽𝔂.</text>
+    <text x="390" y="76" font-size="20" fill="#C4567C">﹏</text>
+    <text x="390" y="108" font-size="15" letter-spacing="1.5" fill="#6E6377">心怀谦卑之时，便是趋近伟大之刻。</text>
+    <text x="390" y="138" font-size="14" fill="#B3A8B9">⋆</text>
+  </g>
+
+  <g class="qc" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" text-anchor="middle">
+    <text x="390" y="46" font-size="14.5" letter-spacing="0.3" fill="#7B5FC4">𝓔𝓿𝓮𝓻𝔂 𝔀𝓪𝓵𝓵 𝓲𝓼 𝓪 𝓭𝓸𝓸𝓻.</text>
+    <text x="390" y="76" font-size="20" fill="#C4567C">﹏</text>
+    <text x="390" y="108" font-size="15" letter-spacing="1.5" fill="#6E6377">「凡墙皆是门」</text>
+    <text x="390" y="138" font-size="14" fill="#B3A8B9">⋆</text>
+  </g>
+
+  <g class="qd" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" text-anchor="middle">
+    <text x="390" y="46" font-size="14.5" letter-spacing="0.3" fill="#7B5FC4">𝓚𝓷𝓸𝔀 𝓽𝓱𝔂𝓼𝓮𝓵𝓯.</text>
+    <text x="390" y="76" font-size="20" fill="#C4567C">﹏</text>
+    <text x="390" y="108" font-size="15" letter-spacing="1.5" fill="#6E6377">「认识你自己」</text>
+    <text x="390" y="138" font-size="14" fill="#B3A8B9">⋆</text>
+  </g>
+</svg>

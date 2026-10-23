@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="1200" height="340" role="img">
+  <title>晨光山野</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0.28" y2="1">
+      <stop offset="0" stop-color="#FFF2F8"/>
+      <stop offset="0.36" stop-color="#FBE3F5"/>
+      <stop offset="0.66" stop-color="#EEE0FF"/>
+      <stop offset="1" stop-color="#DEEFFC"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFC2D8" stop-opacity="0.9"/>
+      <stop offset="0.45" stop-color="#FFC2D8" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#FFC2D8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF0F6"/>
+      <stop offset="1" stop-color="#FFC6DA"/>
+    </linearGradient>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D5C0EF"/>
+      <stop offset="1" stop-color="#E3D4F6"/>
+    </linearGradient>
+    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B99CE5"/>
+      <stop offset="1" stop-color="#CDB3EF"/>
+    </linearGradient>
+    <linearGradient id="near" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8F6BCB"/>
+      <stop offset="1" stop-color="#A987DC"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="340" fill="url(#sky)"/>
+
+  <circle cx="882" cy="146" r="150" fill="url(#glow)"/>
+  <circle cx="882" cy="146" r="44" fill="url(#sun)"/>
+
+  <g fill="#F5C26B" opacity="0.55">
+    <path d="M214 74 C215.4 82 216.6 83.2 224.6 84.6 C216.6 86 215.4 87.2 214 95.2 C212.6 87.2 211.4 86 203.4 84.6 C211.4 83.2 212.6 82 214 74 Z"/>
+    <path d="M1012 62 C1013.2 68.6 1014.2 69.6 1020.8 70.8 C1014.2 72 1013.2 73 1012 79.6 C1010.8 73 1009.8 72 1003.2 70.8 C1009.8 69.6 1010.8 68.6 1012 62 Z"/>
+    <path d="M392 132 C393.2 138.6 394.2 139.6 400.8 140.8 C394.2 142 393.2 143 392 149.6 C390.8 143 389.8 142 383.2 140.8 C389.8 139.6 390.8 138.6 392 132 Z"/>
+    <path d="M716 46 C717.2 52.6 718.2 53.6 724.8 54.8 C718.2 56 717.2 57 716 63.6 C714.8 57 713.8 56 707.2 54.8 C713.8 53.6 714.8 52.6 716 46 Z"/>
+  </g>
+
+  <path d="M0 252 C120 214 206 244 306 218 C402 193 470 238 580 222 C690 206 762 252 882 232 C982 215 1084 246 1200 226 L1200 340 L0 340 Z" fill="url(#far)" opacity="0.72"/>
+  <path d="M0 286 C142 252 242 278 362 260 C482 242 562 282 702 266 C822 252 922 290 1042 272 C1112 262 1162 282 1200 274 L1200 340 L0 340 Z" fill="url(#mid)" opacity="0.78"/>
+  <path d="M0 316 C162 294 282 312 422 300 C562 288 682 316 822 304 C942 293 1062 314 1200 302 L1200 340 L0 340 Z" fill="url(#near)" opacity="0.82"/>
+
+  <g fill="#F7B7CC" opacity="0.75">
+    <ellipse cx="152" cy="188" rx="6" ry="3.4" transform="rotate(-28 152 188)"/>
+    <ellipse cx="268" cy="122" rx="5" ry="2.8" transform="rotate(34 268 122)"/>
+    <ellipse cx="470" cy="196" rx="6.4" ry="3.6" transform="rotate(16 470 196)"/>
+    <ellipse cx="604" cy="108" rx="5" ry="2.8" transform="rotate(-42 604 108)"/>
+    <ellipse cx="812" cy="176" rx="6" ry="3.4" transform="rotate(52 812 176)"/>
+    <ellipse cx="960" cy="230" rx="5.4" ry="3" transform="rotate(-18 960 230)"/>
+    <ellipse cx="1082" cy="140" rx="5" ry="2.8" transform="rotate(26 1082 140)"/>
+    <ellipse cx="352" cy="70" rx="4.6" ry="2.6" transform="rotate(8 352 70)"/>
+  </g>
+</svg>

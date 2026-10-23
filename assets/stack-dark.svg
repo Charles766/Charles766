@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 250" width="780" height="250" role="img">
+  <title>技术栈索引</title>
+  <desc>以书页目录形式排列的语言、框架与工具清单。</desc>
+
+  <line x1="200" y1="30" x2="200" y2="228" stroke="#2A2140" stroke-width="0.8"/>
+
+  <g font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif">
+    <text x="30" y="55" font-size="20" fill="#8C82A0">语言</text>
+    <text x="30" y="75" font-size="9.5" letter-spacing="2.2" fill="#6E6486">LANGUAGES</text>
+    <text x="30" y="130" font-size="20" fill="#8C82A0">框架</text>
+    <text x="30" y="150" font-size="9.5" letter-spacing="2.2" fill="#6E6486">FRAMEWORKS</text>
+    <text x="30" y="205" font-size="20" fill="#8C82A0">工具</text>
+    <text x="30" y="225" font-size="9.5" letter-spacing="2.2" fill="#6E6486">TOOLS</text>
+  </g>
+
+  <g font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" font-size="22">
+    <circle cx="230" cy="48" r="2.9" fill="#F2A0B5"/>
+    <text x="248" y="55" fill="#F2A0B5">TypeScript</text>
+
+    <circle cx="385" cy="48" r="2.9" fill="none" stroke="#B9A0F0" stroke-width="1.2"/>
+    <text x="403" y="55" fill="#B9A0F0">Go</text>
+
+    <circle cx="460" cy="48" r="2.9" fill="#8FD3EC"/>
+    <text x="478" y="55" fill="#8FD3EC">Rust</text>
+
+    <circle cx="555" cy="48" r="2.9" fill="#B9A0F0"/>
+    <text x="573" y="55" fill="#B9A0F0">Python</text>
+
+    <circle cx="230" cy="123" r="2.9" fill="none" stroke="#8FD3EC" stroke-width="1.2"/>
+    <text x="248" y="130" fill="#8FD3EC">React</text>
+
+    <circle cx="350" cy="123" r="2.9" fill="#F2A0B5"/>
+    <text x="368" y="130" fill="#F2A0B5">Node.js</text>
+
+    <circle cx="230" cy="198" r="2.9" fill="#B9A0F0"/>
+    <text x="248" y="205" fill="#B9A0F0">PostgreSQL</text>
+
+    <circle cx="398" cy="198" r="2.9" fill="none" stroke="#8FD3EC" stroke-width="1.2"/>
+    <text x="416" y="205" fill="#8FD3EC">Redis</text>
+
+    <circle cx="502" cy="198" r="2.9" fill="#F2A0B5"/>
+    <text x="520" y="205" fill="#F2A0B5">Docker</text>
+
+    <circle cx="618" cy="198" r="2.9" fill="none" stroke="#8FD3EC" stroke-width="1.2"/>
+    <text x="640" y="205" fill="#8FD3EC">Linux</text>
+  </g>
+</svg>
