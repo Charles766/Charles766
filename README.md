@@ -56,12 +56,12 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=00000000&title_color=F2A0B5&icon_color=B9A0F0&text_color=A8A2B8&custom_title=still+moving">
-    <img height="165" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=ffffff00&title_color=D96C8E&icon_color=8B6FD6&text_color=5B5568&custom_title=still+moving">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=171226&title_color=F2A0B5&icon_color=B9A0F0&text_color=A8A2B8&custom_title=still+moving">
+    <img height="165" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=FDF7FA&title_color=D96C8E&icon_color=8B6FD6&text_color=5B5568&custom_title=still+moving">
   </picture>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api/top-langs/?username=Charles766&layout=compact&hide_border=true&langs_count=8&border_radius=14&bg_color=00000000&title_color=F2A0B5&text_color=A8A2B8&custom_title=still+writing">
-    <img height="165" alt="Top languages" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Charles766&layout=compact&hide_border=true&langs_count=8&border_radius=14&bg_color=ffffff00&title_color=D96C8E&text_color=5B5568&custom_title=still+writing">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api/top-langs/?username=Charles766&layout=compact&hide_border=true&langs_count=8&border_radius=14&bg_color=171226&title_color=F2A0B5&text_color=A8A2B8&custom_title=still+writing">
+    <img height="165" alt="Top languages" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Charles766&layout=compact&hide_border=true&langs_count=8&border_radius=14&bg_color=FDF7FA&title_color=D96C8E&text_color=5B5568&custom_title=still+writing">
   </picture>
 </p>
 
@@ -82,10 +82,12 @@
 
 ### 联系 · connect
 
+<!-- 博客地址：把下面 href 里的 https://example.com 换成你的博客，只改这一处即可 -->
+
 <p align="center">
   <a href="mailto:Domainoracles@outlook.com">Email</a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/Charles766">GitHub</a>
+  <a href="https://example.com">Blog</a>
 </p>
 
 
@@ -95,5 +97,4 @@
     <img alt="" src="./assets/quote-light.svg" width="100%">
   </picture>
 </p>
-
 
