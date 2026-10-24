@@ -2,15 +2,17 @@
   <title>技术栈索引</title>
   <desc>以书页目录形式排列的语言、框架与工具清单。</desc>
 
-  <line x1="200" y1="30" x2="200" y2="228" stroke="#2A2140" stroke-width="0.8"/>
+  <rect x="2" y="2" width="776" height="246" rx="14" fill="#171226" stroke="#2A2140" stroke-width="1"/>
+
+  <line x1="200" y1="30" x2="200" y2="228" stroke="#32274A" stroke-width="0.8"/>
 
   <g font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif">
-    <text x="30" y="55" font-size="20" fill="#8C82A0">语言</text>
-    <text x="30" y="75" font-size="9.5" letter-spacing="2.2" fill="#6E6486">LANGUAGES</text>
-    <text x="30" y="130" font-size="20" fill="#8C82A0">框架</text>
-    <text x="30" y="150" font-size="9.5" letter-spacing="2.2" fill="#6E6486">FRAMEWORKS</text>
-    <text x="30" y="205" font-size="20" fill="#8C82A0">工具</text>
-    <text x="30" y="225" font-size="9.5" letter-spacing="2.2" fill="#6E6486">TOOLS</text>
+    <text x="30" y="55" font-size="20" fill="#A69CB4">语言</text>
+    <text x="30" y="75" font-size="9.5" letter-spacing="2.2" fill="#8A7EA0">LANGUAGES</text>
+    <text x="30" y="130" font-size="20" fill="#A69CB4">框架</text>
+    <text x="30" y="150" font-size="9.5" letter-spacing="2.2" fill="#8A7EA0">FRAMEWORKS</text>
+    <text x="30" y="205" font-size="20" fill="#A69CB4">工具</text>
+    <text x="30" y="225" font-size="9.5" letter-spacing="2.2" fill="#8A7EA0">TOOLS</text>
   </g>
 
   <g font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" font-size="22">

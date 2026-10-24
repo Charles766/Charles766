@@ -8,13 +8,13 @@
       <stop offset="1" stop-color="#DEEFFC"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FFC2D8" stop-opacity="0.9"/>
-      <stop offset="0.45" stop-color="#FFC2D8" stop-opacity="0.38"/>
-      <stop offset="1" stop-color="#FFC2D8" stop-opacity="0"/>
+      <stop offset="0" stop-color="#FFB48F" stop-opacity="0.72"/>
+      <stop offset="0.45" stop-color="#FFC2A0" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#FFC2A0" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FFF0F6"/>
-      <stop offset="1" stop-color="#FFC6DA"/>
+      <stop offset="0" stop-color="#FFEBD6"/>
+      <stop offset="1" stop-color="#FFAE88"/>
     </linearGradient>
     <linearGradient id="far" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#D5C0EF"/>
