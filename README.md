@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/banner-dark.svg">
-    <img src="./assets/banner-light.svg" alt="" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-dark.svg">
+    <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-light.svg" alt="晨光山野" width="100%">
   </picture>
 </p>
 
@@ -17,7 +17,7 @@
 <p align="center"><i>把复杂的东西做简单，是我理解的体面。</i></p>
 <p align="center"><sub>Indie developer &nbsp;·&nbsp; Aurora Sprawl</sub></p>
 
-<img src="./assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 关于 · about
 
@@ -38,19 +38,19 @@
 
 <sub>Everything great is built from small things — or so I keep telling myself.</sub>
 
-<img src="./assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 技术 · stack
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/stack-dark.svg">
-    <img alt="技术栈" src="./assets/stack-light.svg" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg">
+    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg" width="100%">
   </picture>
 </p>
 
 
-<img src="./assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 刻度 · in numbers
 
@@ -68,7 +68,7 @@
 
 <p align="center"><sub>仓库大半是半成品；还在动的，都算数。</sub></p>
 
-<img src="./assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 作品 · works
 
@@ -78,7 +78,7 @@
 
 <sub>全部仓库见 [repositories](https://github.com/Charles766?tab=repositories)。</sub>
 
-<img src="./assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 联系 · connect
 
@@ -93,8 +93,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./assets/quote-dark.svg">
-    <img alt="" src="./assets/quote-light.svg" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/quote-dark.svg">
+    <img alt="引语" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/quote-light.svg" width="100%">
   </picture>
 </p>
 
