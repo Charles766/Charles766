@@ -17,4 +17,5 @@
   <circle cx="412" cy="181" r="2.9" fill="none" stroke="#C4567C" stroke-width="1.2"/>
   <text x="428" y="188" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" font-size="22" fill="#C4567C">CSS</text>
   <text x="734" y="188" text-anchor="end" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" font-size="12" fill="#A294AC">10%</text>
+  <text x="746" y="218" text-anchor="end" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" font-size="9" letter-spacing="0.6" fill="#A294AC" opacity="0.75">2026-10-25</text>
 </svg>

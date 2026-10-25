@@ -10,6 +10,7 @@ import json
 import os
 import re
 import urllib.request
+from datetime import datetime, timezone
 
 USER = os.environ.get("GH_USER", "Charles766")
 TOKEN = os.environ.get("GH_TOKEN", "")
@@ -195,6 +196,11 @@ def build_stack_svg(items, theme):
                 f'font-family="{FONT}" font-size="12" fill="{p["pct"]}">{pct}%</text>'
             )
 
+    out.append(
+        f'  <text x="746" y="{height - 14}" text-anchor="end" font-family="{FONT}" '
+        f'font-size="9" letter-spacing="0.6" fill="{p["pct"]}" opacity="0.75">'
+        f'{datetime.now(timezone.utc).strftime("%Y-%m-%d")}</text>'
+    )
     out.append("</svg>")
     return "\n".join(out) + "\n"
 
