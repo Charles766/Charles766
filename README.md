@@ -28,7 +28,7 @@
 这句话记了很多年。它没标记抵达，只替我守住一个位置：在做成与做不成之间，在言说与沉默之间，暂且站住。
 
 <details>
-<summary>继续读</summary>
+<summary><img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/expand.svg" alt="更多"></summary>
 
 
 最难熬的不是开头。开头有火，有还没被消耗的许诺，像泰戈尔那只夏天的飞鸟，飞到窗前，唱完就飞走。结尾也还好，哪怕潦草，至少有个形状。磨人的是中间：火不再跳，只剩均匀的暗热；方向还在，每一步却踩在重复里。荣格说，人后半程要面对阴影，那不是故障，是生命要求完整。中间那段的放弃，多半不是意志不够，是一直拿开头的火去量中间的热。尺子错了，便以为路断了。
@@ -67,10 +67,6 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=171226&title_color=F2A0B5&icon_color=B9A0F0&text_color=A8A2B8&custom_title=still+moving">
     <img height="165" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=FDF7FA&title_color=D96C8E&icon_color=8B6FD6&text_color=5B5568&custom_title=still+moving">
-  </picture>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api/top-langs/?username=Charles766&layout=compact&hide_border=true&langs_count=8&border_radius=14&bg_color=171226&title_color=F2A0B5&text_color=A8A2B8&custom_title=still+writing">
-    <img height="165" alt="Top languages" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Charles766&layout=compact&hide_border=true&langs_count=8&border_radius=14&bg_color=FDF7FA&title_color=D96C8E&text_color=5B5568&custom_title=still+writing">
   </picture>
 </p>
 
