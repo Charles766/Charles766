@@ -37,6 +37,7 @@ PALETTE = {
         "label": "#7A6E85",
         "label_en": "#A294AC",
         "pct": "#A294AC",
+        "stamp": "#9C90A4",
         "colors": ["#C4567C", "#7B5FC4", "#3E8FB0"],
     },
     "dark": {
@@ -46,6 +47,7 @@ PALETTE = {
         "label": "#A69CB4",
         "label_en": "#8A7EA0",
         "pct": "#8A7EA0",
+        "stamp": "#B4AAC4",
         "colors": ["#F2A0B5", "#B9A0F0", "#8FD3EC"],
     },
 }
@@ -198,7 +200,7 @@ def build_stack_svg(items, theme):
 
     out.append(
         f'  <text x="746" y="{height - 14}" text-anchor="end" font-family="{FONT}" '
-        f'font-size="9" letter-spacing="0.6" fill="{p["pct"]}" opacity="0.75">'
+        f'font-size="9.5" letter-spacing="0.6" fill="{p["stamp"]}">'
         f'{datetime.now(timezone.utc).strftime("%Y-%m-%d")}</text>'
     )
     out.append("</svg>")
