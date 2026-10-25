@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 30" width="660" height="30" role="img">
+  <title>更多</title>
+  <desc>折叠区域的展开按钮，浅灰细字配一条渐隐点线。</desc>
+  <defs>
+    <linearGradient id="fade" gradientUnits="userSpaceOnUse" x1="46" y1="0" x2="660" y2="0">
+      <stop offset="0" stop-color="#8E82A0" stop-opacity="0.6"/>
+      <stop offset="0.5" stop-color="#8E82A0" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#8E82A0" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <text x="0" y="20" font-family="Georgia, 'Times New Roman', 'Songti SC', SimSun, serif" font-size="13.5" letter-spacing="2" fill="#A79BB2">更多</text>
+  <line x1="46" y1="15.5" x2="660" y2="15.5" stroke="url(#fade)" stroke-width="1" stroke-dasharray="1.2 3.2" stroke-linecap="round"/>
+</svg>
