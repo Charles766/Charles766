@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/banner-dark.svg">
-    <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/banner-light.svg" alt="晨光山野" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-dark.svg">
+    <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-light.svg" alt="晨光山野" width="100%">
   </picture>
 </p>
 
@@ -19,7 +19,7 @@
 <p align="center"><i>把复杂的东西做简单，是我理解的体面。</i></p>
 <p align="center"><sub>Indie developer &nbsp;·&nbsp; Aurora Sprawl</sub></p>
 
-<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 关于 · about
 
@@ -56,20 +56,20 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 </details>
 
-<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 技术 · stack
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/stack-dark.svg">
-    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/stack-light.svg" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg">
+    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg" width="100%">
   </picture>
 </p>
 
 
 
-<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 刻度 · in numbers
 
@@ -84,7 +84,7 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center"><sub>仓库大半是半成品；还在动的，都算数。</sub></p>
 
-<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 作品 · works
 
@@ -94,7 +94,7 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <sub>全部仓库见 [repositories](https://github.com/Charles766?tab=repositories)。</sub>
 
-<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/divider.svg" width="100%" alt="">
+<img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg" width="100%" alt="">
 
 ### 联系 · connect
 
@@ -110,8 +110,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/quote-dark.svg">
-    <img alt="引语" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@3b0a83425b6a4a2003482761f5d59a30caaec6f7/assets/quote-light.svg" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/quote-dark.svg">
+    <img alt="引语" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/quote-light.svg" width="100%">
   </picture>
 </p>
 
