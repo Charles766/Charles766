@@ -7,12 +7,14 @@
 
 
 
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=600&size=40&duration=3200&pause=1400&color=F2A0B5&center=true&vCenter=true&width=620&lines=Charles">
     <img alt="Charles" src="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=600&size=40&duration=3200&pause=1400&color=D96C8E&center=true&vCenter=true&width=620&lines=Charles">
   </picture>
 </p>
+
 
 
 
@@ -33,6 +35,7 @@
 
 <details>
 <summary>一些随想</summary>
+
 
 
 
@@ -69,6 +72,7 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 
 
+
 <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg?v=20261026a" width="100%" alt="">
 
 ### 刻度 · in numbers
@@ -79,6 +83,7 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
     <img height="165" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=FDF7FA&title_color=D96C8E&icon_color=8B6FD6&text_color=5B5568&custom_title=still+moving">
   </picture>
 </p>
+
 
 
 
@@ -105,6 +110,7 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
   &nbsp;·&nbsp;
   <a href="https://example.com">Blog</a>
 </p>
+
 
 
 
