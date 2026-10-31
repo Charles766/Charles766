@@ -6,12 +6,14 @@
 </p>
 
 
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=600&size=40&duration=3200&pause=1400&color=F2A0B5&center=true&vCenter=true&width=620&lines=Charles">
     <img alt="Charles" src="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=600&size=40&duration=3200&pause=1400&color=D96C8E&center=true&vCenter=true&width=620&lines=Charles">
   </picture>
 </p>
+
 
 
 <p align="center"><i>把复杂的东西做简单，是我理解的体面。</i></p>
@@ -31,6 +33,7 @@
 
 <details>
 <summary>一些随想</summary>
+
 
 
 开头有火，是什么都还没被写坏；而结尾有形状，潦草也算。磨人的是中间：火不跳了，只剩下均匀的暗热，每一步都在重复。日光之下并无新事，我一度以为这是失败，后来疑心这是所有造物者的共同处境 —— 神在第七天歇了工，而我们这些学着祂样子造东西的人，要在第六天的泥泞里，待很久。
@@ -65,6 +68,7 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 </p>
 
 
+
 <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg?v=20261026a" width="100%" alt="">
 
 ### 刻度 · in numbers
@@ -75,6 +79,7 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
     <img height="165" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=FDF7FA&title_color=D96C8E&icon_color=8B6FD6&text_color=5B5568&custom_title=still+moving">
   </picture>
 </p>
+
 
 
 <p align="center"><sub>仓库大半是半成品；还在动的，都算数。</sub></p>
@@ -102,9 +107,11 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 </p>
 
 
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/quote-dark.svg?v=20261026a">
     <img alt="引语" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/quote-light.svg?v=20261026a" width="100%">
   </picture>
 </p>
+
