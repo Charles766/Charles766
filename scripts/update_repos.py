@@ -6,6 +6,7 @@ Two outputs:
   2. assets/stack-{light,dark}.svg — regenerated from real language bytes
 """
 
+import hashlib
 import json
 import os
 import re
@@ -223,6 +224,18 @@ def write_if_changed(path, content):
 def main():
     repos = fetch_repos()
 
+    # 1) 先生成 stack SVG，拿到最终内容（版本号要用它算）
+    items = collect_languages(repos)
+    svgs = {}
+    svg_changed = False
+    for theme in ("light", "dark"):
+        path = f"assets/stack-{theme}.svg"
+        content = build_stack_svg(items, theme)
+        svgs[theme] = content
+        if write_if_changed(path, content):
+            svg_changed = True
+
+    # 2) 更新 README：REPOS 区块 + stack 图的版本号
     table = build_table(repos)
     with open(README, encoding="utf-8") as f:
         text = f.read()
@@ -230,21 +243,20 @@ def main():
     if not pattern.search(text):
         raise SystemExit(f"markers not found in {README}")
     new_text = pattern.sub(lambda _m: f"{START}\n{table}\n{END}", text)
+
+    # 版本号 = SVG 内容 hash：内容不变 URL 不变（CDN 命中），内容变才换钥匙
+    ver = hashlib.md5((svgs["dark"] + svgs["light"]).encode("utf-8")).hexdigest()[:8]
+    new_text = re.sub(r"(assets/stack-dark\.svg\?v=)[\w.-]+", lambda m: m.group(1) + ver, new_text)
+    new_text = re.sub(r"(assets/stack-light\.svg\?v=)[\w.-]+", lambda m: m.group(1) + ver, new_text)
+
     readme_changed = new_text != text
     if readme_changed:
         with open(README, "w", encoding="utf-8", newline="\n") as f:
             f.write(new_text)
 
-    items = collect_languages(repos)
-    svg_changed = False
-    for theme in ("light", "dark"):
-        path = f"assets/stack-{theme}.svg"
-        if write_if_changed(path, build_stack_svg(items, theme)):
-            svg_changed = True
-
     langs = ", ".join(f"{n} {p}%" for n, p in items) or "none"
     print(f"readme={'changed' if readme_changed else 'unchanged'} "
-          f"svg={'changed' if svg_changed else 'unchanged'}")
+          f"svg={'changed' if svg_changed else 'unchanged'} stack_ver={ver}")
     print(f"languages: {langs}")
 
 
