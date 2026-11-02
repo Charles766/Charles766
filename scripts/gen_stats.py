@@ -11,13 +11,16 @@ W, H = 495, 195
 
 def api(path):
     # gh 优先（Actions 里有 GITHUB_TOKEN，限额高）；否则 curl（本地走代理 / 直连自适应）
+    hdr = "Accept: application/vnd.github+json"
     try:
-        p = subprocess.run(["gh", "api", path], capture_output=True, text=True, timeout=45)
+        p = subprocess.run(["gh", "api", "-H", hdr, path],
+                           capture_output=True, text=True, timeout=45)
         if p.returncode == 0 and p.stdout.strip():
             return json.loads(p.stdout)
     except Exception:
         pass
-    r = subprocess.run(["curl", "-sL", "-k", "-m", "30", "https://api.github.com/" + path],
+    r = subprocess.run(["curl", "-sL", "-k", "-m", "30", "-H", hdr,
+                        "https://api.github.com/" + path],
                        capture_output=True, text=True, timeout=45)
     try:
         return json.loads(r.stdout)
@@ -25,13 +28,11 @@ def api(path):
         return {}
 
 user = api("users/%s" % USER)
-repos = api("users/%s/repos?per_page=100&type=public" % USER)
 commits = api("search/commits?q=author:%s" % USER)
 
 public_repos = user.get("public_repos", 0) or 0
 following = user.get("following", 0) or 0
 created = (user.get("created_at") or "2021-01-01")[:4]
-total_stars = sum(r.get("stargazers_count", 0) for r in repos) if isinstance(repos, list) else 0
 tc = commits.get("total_count") if isinstance(commits, dict) else None
 total_commits = tc if isinstance(tc, int) else "?"
 
