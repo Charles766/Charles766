@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: profile-readme      # 与 profile.yml 共用同一队列，避免两个 workflow 同时改 README
+  cancel-in-progress: false
+
 jobs:
   stats:
     runs-on: ubuntu-latest
