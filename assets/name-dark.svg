@@ -26,7 +26,9 @@
 
   <!-- 打字进度：这条线从 0 长到 620，textPath 沿它逐字显形 -->
   <path id="tw" d="m0,25 h620" fill="none">
-    <animate attributeName="d" begin="0s;tw.end" dur="4600ms" fill="remove"
+    <!-- 循环要靠 animate 自己的 id（d0.end）。写成 tw.end 引用外层 path 会形成循环依赖，
+         Chrome 解析不出来，于是动画只播一遍就停在满字状态。 -->
+    <animate id="d0" attributeName="d" begin="0s;d0.end" dur="4600ms" fill="remove"
              values="m0,25 h0 ; m0,25 h620 ; m0,25 h620 ; m0,25 h0"
              keyTimes="0;0.55652;0.86087;1"/>
   </path>

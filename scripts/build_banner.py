@@ -341,21 +341,21 @@ EXTRA_DEFS = """
       <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <radialGradient id="blaze" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FFFDF2" stop-opacity="0.86"/>
-      <stop offset="0.18" stop-color="#FFF0C4" stop-opacity="0.52"/>
-      <stop offset="0.42" stop-color="#FFDFA0" stop-opacity="0.26"/>
-      <stop offset="0.70" stop-color="#FFC98A" stop-opacity="0.10"/>
+      <stop offset="0" stop-color="#FFFDF2" stop-opacity="0.95"/>
+      <stop offset="0.18" stop-color="#FFF0C4" stop-opacity="0.64"/>
+      <stop offset="0.42" stop-color="#FFDFA0" stop-opacity="0.33"/>
+      <stop offset="0.70" stop-color="#FFC98A" stop-opacity="0.13"/>
       <stop offset="1" stop-color="#FFB878" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="coreGlow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/>
-      <stop offset="0.45" stop-color="#FFFDF0" stop-opacity="0.72"/>
-      <stop offset="0.75" stop-color="#FFEFC6" stop-opacity="0.28"/>
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="0.45" stop-color="#FFFDF0" stop-opacity="0.86"/>
+      <stop offset="0.75" stop-color="#FFEFC6" stop-opacity="0.34"/>
       <stop offset="1" stop-color="#FFE3A8" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="dawnWash" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FFD9A0" stop-opacity="0.34"/>
-      <stop offset="0.5" stop-color="#FFC98E" stop-opacity="0.17"/>
+      <stop offset="0" stop-color="#FFD9A0" stop-opacity="0.44"/>
+      <stop offset="0.5" stop-color="#FFC98E" stop-opacity="0.23"/>
       <stop offset="1" stop-color="#FFB87A" stop-opacity="0"/>
     </radialGradient>
     <!-- 破晓的暖光只铺在天上，不往下糊到山体上 -->
@@ -832,6 +832,10 @@ def main():
     )
 
     out = []
+    ridge = '  <path d="M0 252 C120 214 206 244 306 218'
+    assert ridge in dbody, "找不到远山山脊，破晓光没处插"
+    dbody = dbody.replace(ridge, SUN_BLAZE + "\n" + ridge, 1)
+
     out.append('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="2400" height="680" role="img">')
     out.append("  <title>%s</title>" % title)
     out.append("  <desc>%s</desc>" % desc)
@@ -851,7 +855,6 @@ def main():
     out.append('  <g class="nightScene">')
     out.append(dbody)
     out.append("  </g>")
-    out.append(SUN_BLAZE)
     out.append("</svg>")
     svg = "\n".join(out)
 
