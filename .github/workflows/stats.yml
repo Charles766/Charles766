@@ -1,0 +1,37 @@
+name: refresh-stats-card
+
+on:
+  schedule:
+    - cron: "17 4 * * *"        # 每天 UTC 04:17，与 profile.yml 的 03:17 错开
+  workflow_dispatch:            # 也可在 Actions 页手动 Run workflow
+
+permissions:
+  contents: write
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Generate stats SVG
+        env:
+          STATS_USER: Charles766
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/gen_stats.py
+
+      - name: Commit back if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md assets/stats-dark.svg assets/stats-light.svg
+          if git diff --cached --quiet; then
+            echo "no change, skip"
+          else
+            git commit -m "chore: refresh stats card"
+            git push
+          fi
