@@ -22,7 +22,9 @@ ASSETS = ROOT / "assets"
 T = 240.0            # 主时钟
 A, B = 2.0, 98.0     # 太阳过境区间
 APEX = (A + B) / 2.0
-MOON_A, MOON_B = 104.0, 220.0   # 月亮过境：日落即全黑，隔 6 秒月亮就起
+MOON_A, MOON_B = 104.0, 236.0   # 月亮过境：日落即全黑，隔 6 秒月亮就起；落得晚些，月落离日出更近
+MOON_X1 = 908.0                 # 月亮落点收在城堡左侧，否则会被城堡挡住十几秒
+MOON_YBASE, MOON_H = 290.0, 216.0   # 月亮弧线两端抬高，少走一段山后的路
 MOON_APEX = (MOON_A + MOON_B) / 2.0
 X0, X1 = 60.0, 1140.0
 YBASE, HEIGHT = 318.0, 244.0
@@ -88,12 +90,15 @@ def replace_kf(css, name, new_block):
 
 # ---------------------------------------------------------------- 弧线
 
-def build_arc(a=None, b=None):
-    """按速度曲线积分，得到 u(t)，再映射到正弦弧上。a/b 可覆盖默认的日出日落区间。"""
+def build_arc(a=None, b=None, x1=None, ybase=None, height=None, k=None):
+    """按速度曲线积分，得到 u(t)，再映射到正弦弧上。a/b/x1/ybase/height 可覆盖默认值。"""
     a = A if a is None else a
     b = B if b is None else b
+    xr = X1 if x1 is None else x1
+    yb = YBASE if ybase is None else ybase
+    hh = HEIGHT if height is None else height
     apex = (a + b) / 2.0
-    k_slow, w_slow = 0.94, 3.2
+    k_slow, w_slow = (0.94 if k is None else k), 3.2
     N = 4000
     ts = [a + (b - a) * i / N for i in range(N + 1)]
     sp = [1.0 - k_slow * math.exp(-((t - apex) / w_slow) ** 2) for t in ts]
@@ -114,7 +119,7 @@ def build_arc(a=None, b=None):
         return (cum[j] + (cum[j2] - cum[j]) * f) / total
 
     def xy(u):
-        return X0 + (X1 - X0) * u, YBASE - HEIGHT * math.sin(math.pi * u)
+        return X0 + (xr - X0) * u, yb - hh * math.sin(math.pi * u)
 
     samples = [(a, u_of(a))]
     t = a
@@ -144,7 +149,7 @@ def arc_keyframes(name, base, samples, xy, a=None, b=None):
 
 SEGMENTS = 30          # 一次过境切 30 段，每段一个相位
 PHASE_PERIOD = 480.0   # 两次过境一个循环，明暗方向左右交替
-U_CLEAR = 0.21         # 月盘整个越过远山山脊时的 u（此时才算"全部出现在画面中"）
+U_CLEAR = 0.12         # 月盘整个越过远山山脊时的 u（此时才算"全部出现在画面中"）
 
 
 def t_of_u(samples, target):
@@ -176,16 +181,70 @@ def phase_keyframes(samples, moon_a, moon_b):
         base = 240.0 * n
         sign = 1.0 if n % 2 == 0 else -1.0
         add(base + t_start - 0.5, 0.0)
+        last = 0.0
         t = t_start
         while t <= t_end + 1e-6:
             ph = (t - t_start) / span
-            off = sign * 94.0 * math.sin(math.pi * ph)
+            # 上升段照常，下降段压缩：让月亮落山时停在凸月而不是亏成全黑，
+            # 否则它会在还悬在天上时就先"看不见"了。
+            sp = ph if ph <= 0.5 else 0.5 + (ph - 0.5) * 0.56
+            off = sign * 94.0 * math.sin(math.pi * sp)
+            last = off
             add(base + t, off)
             t += 1.0
-        add(base + t_end, 0.0)
-        add(base + moon_b, 0.0)
+        add(base + t_end, last)
+        add(base + moon_b, last)      # 保持亮着落下去，归零放到下一轮之前
     add(PHASE_PERIOD, 0.0)
     return "\n".join(f"      {p}% {{ {d} }}" for p, d in steps)
+
+
+SUN_PERIOD = 2160.0    # 太阳的弧线要跨 9 次过境，才能做到"只有日食时才在天顶停"
+
+
+def sun_arc_keyframes():
+    """9 次过境写进一个 2160s 的动画。n % 3 == 0 的那三次正好是日食（50 / 770 / 1490s），
+    只在这三次给天顶减速；其余六次匀速通过，不停。"""
+    lines = []
+
+    def line(t, x, y):
+        return ("      %s%% { transform: translate(%spx, %spx) }"
+                % (pct(t, SUN_PERIOD), fmt(x - SUN_BASE[0]), fmt(y - SUN_BASE[1])))
+
+    lines.append(line(0.0, X0, YBASE))
+    for n in range(9):
+        a, b = A + 240.0 * n, B + 240.0 * n
+        apex = a + 48.0
+        k = 0.94 if n % 3 == 0 else 0.0
+        _, xy, u_of = build_arc(a, b, k=k)
+
+        ts, t = [], a
+        while t <= b + 1e-6:
+            ts.append(t)
+            t += 1.0 if (k > 0 and abs(t - apex) < 14.0) else 4.0
+        if ts[-1] < b:
+            ts.append(b)
+        for tt in ts:
+            x, y = xy(u_of(tt))
+            lines.append(line(tt, x, y))
+
+        nxt = A + 240.0 * (n + 1)
+        lines.append(line(min(b + 0.5, SUN_PERIOD), X1, YBASE))
+        if nxt < SUN_PERIOD:
+            lines.append(line(nxt, X0, YBASE))
+    lines.append(line(SUN_PERIOD, X0, YBASE))
+    return "\n".join(lines)
+
+
+def sun_fade_keyframes():
+    steps = [("0", "opacity: 0")]
+    for n in range(9):
+        a, b = A + 240.0 * n, B + 240.0 * n
+        steps += [(pct(a, SUN_PERIOD), "opacity: 0"),
+                  (pct(a + 1.5, SUN_PERIOD), "opacity: 1"),
+                  (pct(b - 1.5, SUN_PERIOD), "opacity: 1"),
+                  (pct(b, SUN_PERIOD), "opacity: 0")]
+    steps.append(("100", "opacity: 0"))
+    return steps
 
 
 ECL_PERIOD = 2160.0    # 三种食相轮流出现：全食 / 大半食 / 小半食
@@ -402,7 +461,7 @@ def main():
     ldefs, lstyle, lbody = split_svg(light)
 
     samples, xy, _ = build_arc()
-    moon_samples, _, _ = build_arc(MOON_A, MOON_B)
+    moon_samples, moon_xy, _ = build_arc(MOON_A, MOON_B, MOON_X1, MOON_YBASE, MOON_H)
 
     # ---- 暗版：重映射月亮相关时间轴
     for nm in DARK_TIMED:
@@ -488,14 +547,13 @@ def main():
 
     css = ["    /* ===== 统一时钟 240s：日月沿同一条弧线，只在过天顶时减速 ===== */"]
     css.append("    @keyframes arcSun {")
-    css.append(arc_keyframes("arcSun", SUN_BASE, samples, xy))
+    css.append(sun_arc_keyframes())
     css.append("    }")
     css.append("    @keyframes arcMoon {")
-    css.append(arc_keyframes("arcMoon", MOON_BASE, moon_samples, xy, MOON_A, MOON_B))
+    css.append(arc_keyframes("arcMoon", MOON_BASE, moon_samples, moon_xy, MOON_A, MOON_B))
     css.append("    }")
 
-    fade = [(0.0, 0.0), (A, 0.0), (A + 1.5, 1.0), (B - 1.5, 1.0), (B, 0.0), (T, 0.0)]
-    css.append(kfs("bodyFade", [(pct(t), f"opacity: {fmt(o)}") for t, o in fade]))
+    css.append(kfs("fadeSun", sun_fade_keyframes()))
     fade_m = [(0.0, 0.0), (MOON_A, 0.0), (MOON_A + 1.5, 1.0),
               (MOON_B - 1.5, 1.0), (MOON_B, 0.0), (T, 0.0)]
     css.append(kfs("fadeMoon", [(pct(t), f"opacity: {fmt(o)}") for t, o in fade_m]))
@@ -557,7 +615,7 @@ def main():
     ]))
 
     css.append("    .nightScene { animation: nightIn 240s linear infinite }")
-    css.append("    .l-sunwrap { animation: arcSun 240s linear infinite, bodyFade 240s linear infinite }")
+    css.append("    .l-sunwrap { animation: arcSun 2160s linear infinite, fadeSun 2160s linear infinite }")
     css.append("    .moonArc { animation: arcMoon 240s linear infinite, fadeMoon 240s linear infinite }")
     css.append("    .l-sunwash { animation: sunFade 240s linear infinite }")
     css.append(kfs("dawnBand240", [
@@ -650,7 +708,7 @@ def main():
         "日落反过来：太阳往下沉，天色跟着暗，一落到山脊后面就全黑，不留尾巴。"
         "全黑之后隔六秒，第 104 秒月亮就从东边起来了——先是一枚完整的黑新月，"
         "等它整个越过远山、圆盘完整地悬在画面上，相位才开始连续地转："
-        "渐渐亮成蛾眉、上弦、凸月，到天顶时正好是满月，再一路亏回新月落下；相邻两次过境明暗左右交替。"
+        "渐渐亮成蛾眉、上弦、凸月，到天顶时正好是满月，再一路亏成凸月落下；相邻两次过境明暗左右交替。"
         "月全食不是每夜都有，隔一个满月才来一次，铜红缓缓浸透月盘再退去。"
         "日食分三种，轮流出现：正午月亮正对太阳是日全食，从太阳上方掠过是大半食，擦过边缘是小半食。"
         "日食时城堡上空浮起一座发光的十字架，淡金光晕笼住整座城堡：全食最盛，半食只是淡淡一道，食尽即散。"
