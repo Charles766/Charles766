@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-dark.svg?v=20261031n">
-    <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-light.svg?v=20261031n" alt="晨光山野" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-dark.svg?v=20261102a">
+    <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-light.svg?v=20261102a" alt="晨光山野" width="100%">
   </picture>
 </p>
 
@@ -65,8 +65,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=bccede4b">
-    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=bccede4b" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=20261101a">
+    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=20261101a" width="100%">
   </picture>
 </p>
 
