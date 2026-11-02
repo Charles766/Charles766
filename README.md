@@ -65,8 +65,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=20261026a">
-    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=20261026a" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=20261101a">
+    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=20261101a" width="100%">
   </picture>
 </p>
 
@@ -79,8 +79,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=171226&title_color=F2A0B5&icon_color=B9A0F0&text_color=A8A2B8&custom_title=still+moving">
-    <img height="165" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=Charles766&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&border_radius=14&bg_color=FDF7FA&title_color=D96C8E&icon_color=8B6FD6&text_color=5B5568&custom_title=still+moving">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-dark.svg?v=e0bf6951">
+    <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=e0bf6951">
   </picture>
 </p>
 
