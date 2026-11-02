@@ -1223,7 +1223,7 @@
     }
     @keyframes bodyFade { 0% { opacity: 0 } 0.833% { opacity: 0 } 1.458% { opacity: 1 } 40.208% { opacity: 1 } 40.833% { opacity: 0 } 100% { opacity: 0 } }
     @keyframes fadeMoon { 0% { opacity: 0 } 43.333% { opacity: 0 } 43.958% { opacity: 1 } 91.042% { opacity: 1 } 91.667% { opacity: 0 } 100% { opacity: 0 } }
-    @keyframes nightIn { 0% { opacity: .90 } 0.833% { opacity: .86 } 4.167% { opacity: .45 } 7.5% { opacity: .15 } 11.667% { opacity: 0 } 29.167% { opacity: 0 } 34.167% { opacity: .18 } 36.667% { opacity: .45 } 39.167% { opacity: .78 } 40.833% { opacity: 1 } 90% { opacity: 1 } 96.667% { opacity: .94 } 100% { opacity: .90 } }
+    @keyframes nightIn { 0% { opacity: .92 } 1.667% { opacity: .90 } 3.333% { opacity: .86 } 5% { opacity: .74 } 6.667% { opacity: .56 } 8.333% { opacity: .36 } 10% { opacity: .18 } 11.667% { opacity: .05 } 13.333% { opacity: 0 } 29.167% { opacity: 0 } 34.167% { opacity: .18 } 36.667% { opacity: .45 } 39.167% { opacity: .78 } 40.833% { opacity: 1 } 90% { opacity: 1 } 96.667% { opacity: .94 } 100% { opacity: .92 } }
     @keyframes duskBand { 0% { opacity: .9 } 41% { opacity: .9 } 56% { opacity: 0 } 84% { opacity: 0 } 96% { opacity: .55 } 100% { opacity: .9 } }
     @keyframes mphaseNew {
       0% { transform: translateX(0px) }
@@ -1403,7 +1403,7 @@
     @keyframes dnNight { 0% { opacity: 0 } 41.667% { opacity: 0 } 47.5% { opacity: 1 } 89.167% { opacity: 1 } 95.833% { opacity: 0 } 100% { opacity: 0 } }
     .dn-day { animation: dnDay 240s linear infinite }
     .dn-night { animation: dnNight 240s linear infinite }
-    @keyframes holyCrossIn { 0% { opacity: 0 } 1.944% { opacity: 0 } 2.222% { opacity: 1 } 2.593% { opacity: 1 } 2.963% { opacity: 0 } 100% { opacity: 0 } }
+    @keyframes holyCrossIn { 0% { opacity: 0 } 1.667% { opacity: 0 } 2.037% { opacity: 1 } 2.593% { opacity: 1 } 2.963% { opacity: 0 } 35% { opacity: 0 } 35.37% { opacity: 0.62 } 35.926% { opacity: 0.62 } 36.296% { opacity: 0 } 68.333% { opacity: 0 } 68.704% { opacity: 0.45 } 69.259% { opacity: 0.45 } 69.63% { opacity: 0 } 100% { opacity: 0 } }
     .holyCross { animation: holyCrossIn 2160s linear infinite }
     @keyframes pentIn { 0% { opacity: 0 } 14.375% { opacity: 0 } 16.458% { opacity: .8 } 17.708% { opacity: 1 } 19.167% { opacity: .8 } 20.833% { opacity: 0 } 100% { opacity: 0 } }
     @keyframes pentPop { 0% { transform: scale(.86) } 14.375% { transform: scale(.86) } 17.5% { transform: scale(1) } 18.75% { transform: scale(1) } 100% { transform: scale(.86) } }

@@ -501,11 +501,15 @@ def main():
     css.append(kfs("fadeMoon", [(pct(t), f"opacity: {fmt(o)}") for t, o in fade_m]))
     # 夜色浓度跟着太阳高度走，而且太阳一落到底就全黑，不再拖到月出。
     css.append(kfs("nightIn", [
-        ("0", "opacity: .90"),
-        (pct(2), "opacity: .86"),      # 日出
-        (pct(10), "opacity: .45"),
-        (pct(18), "opacity: .15"),
-        (pct(28), "opacity: 0"),
+        ("0", "opacity: .92"),
+        (pct(4), "opacity: .90"),
+        (pct(8), "opacity: .86"),      # 太阳刚越过远山，天还暗着
+        (pct(12), "opacity: .74"),
+        (pct(16), "opacity: .56"),
+        (pct(20), "opacity: .36"),
+        (pct(24), "opacity: .18"),
+        (pct(28), "opacity: .05"),
+        (pct(32), "opacity: 0"),
         (pct(70), "opacity: 0"),
         (pct(82), "opacity: .18"),
         (pct(88), "opacity: .45"),
@@ -513,7 +517,7 @@ def main():
         (pct(98), "opacity: 1"),       # 日落即全黑
         (pct(216), "opacity: 1"),
         (pct(232), "opacity: .94"),
-        ("100", "opacity: .90"),
+        ("100", "opacity: .92"),
     ]))
     css.append(kfs("duskBand", [
         ("0", "opacity: .9"), ("41", "opacity: .9"), ("56", "opacity: 0"),
@@ -594,15 +598,19 @@ def main():
     css.append("    .dn-day { animation: dnDay 240s linear infinite }")
     css.append("    .dn-night { animation: dnNight 240s linear infinite }")
 
-    # 日全食的十字架：跟着日食窗口走，食尽即散
-    css.append(kfs("holyCrossIn", [
-        ("0", "opacity: 0"),
-        (pct(42, ECL_PERIOD), "opacity: 0"),
-        (pct(48, ECL_PERIOD), "opacity: 1"),
-        (pct(56, ECL_PERIOD), "opacity: 1"),
-        (pct(64, ECL_PERIOD), "opacity: 0"),
-        ("100", "opacity: 0"),
-    ]))
+    # 十字架：每次日食都浮现，亮度跟着食分走 —— 全食最盛，半食只是淡淡一道，
+    # 日食结束就散。这样不管看到的是哪一次食，天上都有东西。
+    steps = [("0", "opacity: 0")]
+    for C, Y, kind in ECLIPSES:
+        peak = {"total": 1.0, "partial": 0.62}[kind]
+        if Y >= 55:
+            peak = 0.45
+        steps += [(pct(C - 14, ECL_PERIOD), "opacity: 0"),
+                  (pct(C - 6, ECL_PERIOD), "opacity: %s" % fmt(peak)),
+                  (pct(C + 6, ECL_PERIOD), "opacity: %s" % fmt(peak)),
+                  (pct(C + 14, ECL_PERIOD), "opacity: 0")]
+    steps.append(("100", "opacity: 0"))
+    css.append(kfs("holyCrossIn", steps))
     css.append("    .holyCross { animation: holyCrossIn 2160s linear infinite }")
 
     # 月全食的倒五角星：铜红最浓时浮现，褪色时散去

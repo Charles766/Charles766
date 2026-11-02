@@ -1,7 +1,6 @@
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner.svg?v=cca85dd5" alt="山野一日" width="100%">
+  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner.svg?v=e4965ac1" alt="山野一日" width="100%">
 </p>
-
 
 
 
@@ -11,7 +10,6 @@
     <img alt="Charles" src="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=600&size=40&duration=3200&pause=1400&color=D96C8E&center=true&vCenter=true&width=620&lines=Charles">
   </picture>
 </p>
-
 
 
 
@@ -32,7 +30,6 @@
 
 <details>
 <summary>一些随想</summary>
-
 
 
 
@@ -69,7 +66,6 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 
 
-
 <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/divider.svg?v=20261026a" width="100%" alt="">
 
 ### 刻度 · in numbers
@@ -80,7 +76,6 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
     <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=4e1d1c5a">
   </picture>
 </p>
-
 
 
 
@@ -107,7 +102,6 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
   &nbsp;·&nbsp;
   <a href="https://example.com">Blog</a>
 </p>
-
 
 
 
