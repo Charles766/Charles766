@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner.svg?v=b03e6489" alt="山野一日" width="100%">
+  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner.svg?v=cca85dd5" alt="山野一日" width="100%">
 </p>
 
 
