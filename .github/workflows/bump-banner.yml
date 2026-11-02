@@ -1,11 +1,9 @@
-name: build-banner
+name: pin-banner
 
 on:
   push:
     paths:
-      - "assets/banner-dark.svg"
-      - "assets/banner-light.svg"
-      - "scripts/build_banner.py"
+      - "assets/banner.svg"
   workflow_dispatch:
 
 permissions:
@@ -16,26 +14,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  pin:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # 要 git log 找 banner.svg 最后一次改动
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
 
-      - name: Build banner and bump version
-        run: python scripts/bump_banner.py
-
-      - name: Commit if changed
+      # 只做一件事：把 README 里 banner 的地址钉到「最后一次改动 banner.svg 的提交」上。
+      # 不再从源 SVG 重新构建 —— 上传什么就显示什么，不会被覆盖。
+      - name: Pin README to the banner's commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add assets/banner.svg README.md
+          python scripts/pin_banner_sha.py
+          git add README.md
           if git diff --cached --quiet; then
-            echo "no change, skip"
+            echo "README already pinned"
           else
-            git commit -m "chore: rebuild banner + bump version"
+            git commit -m "chore: pin banner to commit sha"
             git push
           fi
