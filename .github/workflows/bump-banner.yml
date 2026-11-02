@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - "assets/banner.svg"
+      - "assets/name-dark.svg"
+      - "assets/name-light.svg"
   workflow_dispatch:
 
 permissions:
