@@ -341,16 +341,32 @@ EXTRA_DEFS = """
       <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <radialGradient id="blaze" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/>
-      <stop offset="0.10" stop-color="#FFF8DC" stop-opacity="0.80"/>
-      <stop offset="0.28" stop-color="#FFE2A8" stop-opacity="0.42"/>
-      <stop offset="0.55" stop-color="#FFC286" stop-opacity="0.16"/>
-      <stop offset="0.8" stop-color="#FFB274" stop-opacity="0.05"/>
-      <stop offset="1" stop-color="#FFB274" stop-opacity="0"/>
+      <stop offset="0" stop-color="#FFFDF2" stop-opacity="0.86"/>
+      <stop offset="0.18" stop-color="#FFF0C4" stop-opacity="0.52"/>
+      <stop offset="0.42" stop-color="#FFDFA0" stop-opacity="0.26"/>
+      <stop offset="0.70" stop-color="#FFC98A" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#FFB878" stop-opacity="0"/>
     </radialGradient>
-    <filter id="raySoft" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="2.2"/>
-    </filter>
+    <radialGradient id="coreGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#FFFDF0" stop-opacity="0.72"/>
+      <stop offset="0.75" stop-color="#FFEFC6" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#FFE3A8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dawnWash" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFD9A0" stop-opacity="0.34"/>
+      <stop offset="0.5" stop-color="#FFC98E" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="#FFB87A" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 破晓的暖光只铺在天上，不往下糊到山体上 -->
+    <linearGradient id="skyFadeGrad" x1="0" y1="150" x2="0" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#000000"/>
+    </linearGradient>
+    <mask id="skyFade">
+      <rect x="0" y="0" width="1200" height="340" fill="url(#skyFadeGrad)"/>
+    </mask>
     <radialGradient id="holyWash" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#FFF4D4" stop-opacity="0.30"/>
       <stop offset="0.5" stop-color="#FFEBB8" stop-opacity="0.20"/>
@@ -384,27 +400,16 @@ HOLY_CROSS = """
   </g>
 """
 
-# 破晓：盖在夜层之上的强光，暗风景里一轮亮太阳
+# 破晓：盖在夜层之上的光。不用射线 —— 三道同心的柔光就够，
+# 最外一层是贴着山脊的暖色地平线，被 skyFade 压住，只亮天不亮山。
 SUN_BLAZE = """
   <g class="sunBlaze" opacity="0">
-    <circle cx="882" cy="150" r="252" fill="url(#blaze)"/>
-    <g stroke="#FFF6E0" stroke-width="2.6" stroke-linecap="round"
-       filter="url(#raySoft)" opacity="0.55">
-      <line x1="936.1" y1="164.5" x2="1025.0" y2="188.3"/>
-      <line x1="921.6" y1="189.6" x2="996.6" y2="264.6"/>
-      <line x1="896.5" y1="204.1" x2="920.3" y2="293.0"/>
-      <line x1="867.5" y1="204.1" x2="840.1" y2="306.5"/>
-      <line x1="842.4" y1="189.6" x2="777.3" y2="254.7"/>
-      <line x1="827.9" y1="164.5" x2="725.5" y2="191.9"/>
-      <line x1="827.9" y1="135.5" x2="739.0" y2="111.7"/>
-      <line x1="842.4" y1="110.4" x2="767.4" y2="35.4"/>
-      <line x1="867.5" y1="95.9" x2="843.7" y2="7.0"/>
-      <line x1="896.5" y1="95.9" x2="923.9" y2="-6.5"/>
-      <line x1="921.6" y1="110.4" x2="986.7" y2="45.3"/>
-      <line x1="936.1" y1="135.5" x2="1038.5" y2="108.1"/>
-    </g>
+    <ellipse cx="882" cy="228" rx="392" ry="96" fill="url(#dawnWash)" mask="url(#skyFade)"/>
+    <circle cx="882" cy="150" r="188" fill="url(#blaze)"/>
+    <circle cx="882" cy="150" r="62" fill="url(#coreGlow)"/>
   </g>
 """
+
 
 # 月全食：血红倒五角星，里面隐约一个黑山羊头
 PENTAGRAM = """
@@ -651,12 +656,16 @@ def main():
     blaze = [("0", "opacity: 0")]
     for n in range(9):
         a = A + 240.0 * n
+        # 峰值挪到太阳刚越过山脊之后（a+8），而不是还在山后时就把光开到最亮，
+        # 否则地平线那个角上会先糊出一团过曝的白。
         blaze += [(pct(a, SUN_PERIOD), "opacity: 0"),
-                  (pct(a + 3, SUN_PERIOD), "opacity: 1"),
-                  (pct(a + 9, SUN_PERIOD), "opacity: .85"),
-                  (pct(a + 18, SUN_PERIOD), "opacity: .42"),
-                  (pct(a + 28, SUN_PERIOD), "opacity: .10"),
-                  (pct(a + 38, SUN_PERIOD), "opacity: 0")]
+                  (pct(a + 2, SUN_PERIOD), "opacity: .16"),
+                  (pct(a + 5, SUN_PERIOD), "opacity: .62"),
+                  (pct(a + 8, SUN_PERIOD), "opacity: 1"),
+                  (pct(a + 14, SUN_PERIOD), "opacity: .86"),
+                  (pct(a + 22, SUN_PERIOD), "opacity: .46"),
+                  (pct(a + 30, SUN_PERIOD), "opacity: .14"),
+                  (pct(a + 40, SUN_PERIOD), "opacity: 0")]
     blaze.append(("100", "opacity: 0"))
     css.append(kfs("blazeIn", blaze))
     fade_m = [(0.0, 0.0), (MOON_A, 0.0), (MOON_A + 1.5, 1.0),

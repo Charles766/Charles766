@@ -303,16 +303,32 @@
       <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <radialGradient id="blaze" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/>
-      <stop offset="0.10" stop-color="#FFF8DC" stop-opacity="0.80"/>
-      <stop offset="0.28" stop-color="#FFE2A8" stop-opacity="0.42"/>
-      <stop offset="0.55" stop-color="#FFC286" stop-opacity="0.16"/>
-      <stop offset="0.8" stop-color="#FFB274" stop-opacity="0.05"/>
-      <stop offset="1" stop-color="#FFB274" stop-opacity="0"/>
+      <stop offset="0" stop-color="#FFFDF2" stop-opacity="0.86"/>
+      <stop offset="0.18" stop-color="#FFF0C4" stop-opacity="0.52"/>
+      <stop offset="0.42" stop-color="#FFDFA0" stop-opacity="0.26"/>
+      <stop offset="0.70" stop-color="#FFC98A" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#FFB878" stop-opacity="0"/>
     </radialGradient>
-    <filter id="raySoft" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="2.2"/>
-    </filter>
+    <radialGradient id="coreGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#FFFDF0" stop-opacity="0.72"/>
+      <stop offset="0.75" stop-color="#FFEFC6" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#FFE3A8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="dawnWash" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFD9A0" stop-opacity="0.34"/>
+      <stop offset="0.5" stop-color="#FFC98E" stop-opacity="0.17"/>
+      <stop offset="1" stop-color="#FFB87A" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 破晓的暖光只铺在天上，不往下糊到山体上 -->
+    <linearGradient id="skyFadeGrad" x1="0" y1="150" x2="0" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#000000"/>
+    </linearGradient>
+    <mask id="skyFade">
+      <rect x="0" y="0" width="1200" height="340" fill="url(#skyFadeGrad)"/>
+    </mask>
     <radialGradient id="holyWash" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#FFF4D4" stop-opacity="0.30"/>
       <stop offset="0.5" stop-color="#FFEBB8" stop-opacity="0.20"/>
@@ -1509,7 +1525,7 @@
       100% { transform: translate(30px, 170px) }
     }
     @keyframes fadeSun { 0% { opacity: 0 } 0.093% { opacity: 0 } 0.162% { opacity: 1 } 4.468% { opacity: 1 } 4.537% { opacity: 0 } 11.204% { opacity: 0 } 11.273% { opacity: 1 } 15.579% { opacity: 1 } 15.648% { opacity: 0 } 22.315% { opacity: 0 } 22.384% { opacity: 1 } 26.69% { opacity: 1 } 26.759% { opacity: 0 } 33.426% { opacity: 0 } 33.495% { opacity: 1 } 37.801% { opacity: 1 } 37.87% { opacity: 0 } 44.537% { opacity: 0 } 44.606% { opacity: 1 } 48.912% { opacity: 1 } 48.981% { opacity: 0 } 55.648% { opacity: 0 } 55.718% { opacity: 1 } 60.023% { opacity: 1 } 60.093% { opacity: 0 } 66.759% { opacity: 0 } 66.829% { opacity: 1 } 71.134% { opacity: 1 } 71.204% { opacity: 0 } 77.87% { opacity: 0 } 77.94% { opacity: 1 } 82.245% { opacity: 1 } 82.315% { opacity: 0 } 88.981% { opacity: 0 } 89.051% { opacity: 1 } 93.356% { opacity: 1 } 93.426% { opacity: 0 } 100% { opacity: 0 } }
-    @keyframes blazeIn { 0% { opacity: 0 } 0.093% { opacity: 0 } 0.231% { opacity: 1 } 0.509% { opacity: .85 } 0.926% { opacity: .42 } 1.389% { opacity: .10 } 1.852% { opacity: 0 } 11.204% { opacity: 0 } 11.343% { opacity: 1 } 11.62% { opacity: .85 } 12.037% { opacity: .42 } 12.5% { opacity: .10 } 12.963% { opacity: 0 } 22.315% { opacity: 0 } 22.454% { opacity: 1 } 22.731% { opacity: .85 } 23.148% { opacity: .42 } 23.611% { opacity: .10 } 24.074% { opacity: 0 } 33.426% { opacity: 0 } 33.565% { opacity: 1 } 33.843% { opacity: .85 } 34.259% { opacity: .42 } 34.722% { opacity: .10 } 35.185% { opacity: 0 } 44.537% { opacity: 0 } 44.676% { opacity: 1 } 44.954% { opacity: .85 } 45.37% { opacity: .42 } 45.833% { opacity: .10 } 46.296% { opacity: 0 } 55.648% { opacity: 0 } 55.787% { opacity: 1 } 56.065% { opacity: .85 } 56.481% { opacity: .42 } 56.944% { opacity: .10 } 57.407% { opacity: 0 } 66.759% { opacity: 0 } 66.898% { opacity: 1 } 67.176% { opacity: .85 } 67.593% { opacity: .42 } 68.056% { opacity: .10 } 68.519% { opacity: 0 } 77.87% { opacity: 0 } 78.009% { opacity: 1 } 78.287% { opacity: .85 } 78.704% { opacity: .42 } 79.167% { opacity: .10 } 79.63% { opacity: 0 } 88.981% { opacity: 0 } 89.12% { opacity: 1 } 89.398% { opacity: .85 } 89.815% { opacity: .42 } 90.278% { opacity: .10 } 90.741% { opacity: 0 } 100% { opacity: 0 } }
+    @keyframes blazeIn { 0% { opacity: 0 } 0.093% { opacity: 0 } 0.185% { opacity: .16 } 0.324% { opacity: .62 } 0.463% { opacity: 1 } 0.741% { opacity: .86 } 1.111% { opacity: .46 } 1.481% { opacity: .14 } 1.944% { opacity: 0 } 11.204% { opacity: 0 } 11.296% { opacity: .16 } 11.435% { opacity: .62 } 11.574% { opacity: 1 } 11.852% { opacity: .86 } 12.222% { opacity: .46 } 12.593% { opacity: .14 } 13.056% { opacity: 0 } 22.315% { opacity: 0 } 22.407% { opacity: .16 } 22.546% { opacity: .62 } 22.685% { opacity: 1 } 22.963% { opacity: .86 } 23.333% { opacity: .46 } 23.704% { opacity: .14 } 24.167% { opacity: 0 } 33.426% { opacity: 0 } 33.519% { opacity: .16 } 33.657% { opacity: .62 } 33.796% { opacity: 1 } 34.074% { opacity: .86 } 34.444% { opacity: .46 } 34.815% { opacity: .14 } 35.278% { opacity: 0 } 44.537% { opacity: 0 } 44.63% { opacity: .16 } 44.769% { opacity: .62 } 44.907% { opacity: 1 } 45.185% { opacity: .86 } 45.556% { opacity: .46 } 45.926% { opacity: .14 } 46.389% { opacity: 0 } 55.648% { opacity: 0 } 55.741% { opacity: .16 } 55.88% { opacity: .62 } 56.019% { opacity: 1 } 56.296% { opacity: .86 } 56.667% { opacity: .46 } 57.037% { opacity: .14 } 57.5% { opacity: 0 } 66.759% { opacity: 0 } 66.852% { opacity: .16 } 66.991% { opacity: .62 } 67.13% { opacity: 1 } 67.407% { opacity: .86 } 67.778% { opacity: .46 } 68.148% { opacity: .14 } 68.611% { opacity: 0 } 77.87% { opacity: 0 } 77.963% { opacity: .16 } 78.102% { opacity: .62 } 78.241% { opacity: 1 } 78.519% { opacity: .86 } 78.889% { opacity: .46 } 79.259% { opacity: .14 } 79.722% { opacity: 0 } 88.981% { opacity: 0 } 89.074% { opacity: .16 } 89.213% { opacity: .62 } 89.352% { opacity: 1 } 89.63% { opacity: .86 } 90% { opacity: .46 } 90.37% { opacity: .14 } 90.833% { opacity: 0 } 100% { opacity: 0 } }
     @keyframes fadeMoon { 0% { opacity: 0 } 43.333% { opacity: 0 } 43.958% { opacity: 1 } 97.708% { opacity: 1 } 98.333% { opacity: 0 } 100% { opacity: 0 } }
     @keyframes nightIn { 0% { opacity: .92 } 1.667% { opacity: .90 } 3.333% { opacity: .86 } 5% { opacity: .74 } 6.667% { opacity: .56 } 8.333% { opacity: .36 } 10% { opacity: .18 } 11.667% { opacity: .05 } 13.333% { opacity: 0 } 29.167% { opacity: 0 } 34.167% { opacity: .18 } 36.667% { opacity: .45 } 39.167% { opacity: .78 } 40.833% { opacity: 1 } 90% { opacity: 1 } 96.667% { opacity: .94 } 100% { opacity: .92 } }
     @keyframes duskBand { 0% { opacity: .9 } 41% { opacity: .9 } 56% { opacity: 0 } 84% { opacity: 0 } 96% { opacity: .55 } 100% { opacity: .9 } }
@@ -5181,22 +5197,9 @@
   </g>
 
   <g class="sunBlaze" opacity="0">
-    <circle cx="882" cy="150" r="252" fill="url(#blaze)"/>
-    <g stroke="#FFF6E0" stroke-width="2.6" stroke-linecap="round"
-       filter="url(#raySoft)" opacity="0.55">
-      <line x1="936.1" y1="164.5" x2="1025.0" y2="188.3"/>
-      <line x1="921.6" y1="189.6" x2="996.6" y2="264.6"/>
-      <line x1="896.5" y1="204.1" x2="920.3" y2="293.0"/>
-      <line x1="867.5" y1="204.1" x2="840.1" y2="306.5"/>
-      <line x1="842.4" y1="189.6" x2="777.3" y2="254.7"/>
-      <line x1="827.9" y1="164.5" x2="725.5" y2="191.9"/>
-      <line x1="827.9" y1="135.5" x2="739.0" y2="111.7"/>
-      <line x1="842.4" y1="110.4" x2="767.4" y2="35.4"/>
-      <line x1="867.5" y1="95.9" x2="843.7" y2="7.0"/>
-      <line x1="896.5" y1="95.9" x2="923.9" y2="-6.5"/>
-      <line x1="921.6" y1="110.4" x2="986.7" y2="45.3"/>
-      <line x1="936.1" y1="135.5" x2="1038.5" y2="108.1"/>
-    </g>
+    <ellipse cx="882" cy="228" rx="392" ry="96" fill="url(#dawnWash)" mask="url(#skyFade)"/>
+    <circle cx="882" cy="150" r="188" fill="url(#blaze)"/>
+    <circle cx="882" cy="150" r="62" fill="url(#coreGlow)"/>
   </g>
 
 </svg>
