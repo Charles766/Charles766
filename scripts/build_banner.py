@@ -78,6 +78,14 @@ def kf_block(css, name):
     return i, k, css[j + 1: k]
 
 
+def drop_kf(css, name):
+    r = kf_block(css, name)
+    if r is None:
+        return css
+    i, k, _ = r
+    return css[:i] + css[k + 1:]
+
+
 def replace_kf(css, name, new_block):
     r = kf_block(css, name)
     if r is None:
@@ -137,7 +145,10 @@ def arc_keyframes(name, base, samples, xy, a=None, b=None):
     def line(p, x, y):
         return f"      {p}% {{ transform: translate({fmt(x - base[0])}px, {fmt(y - base[1])}px) }}"
 
-    lines = [line("0", X0, YBASE), line(pct(a), X0, YBASE)]
+    # 起点必须用这条弧线自己的 xy(0)，不能用全局 YBASE ——
+    # 月亮的弧线两端抬到了 290，写成 318 会让它在月出那一刻凭空上跳 28px
+    x_start, y_start = xy(0.0)
+    lines = [line("0", x_start, y_start), line(pct(a), x_start, y_start)]
     for t, u in samples[1:-1]:
         x, y = xy(u)
         lines.append(line(pct(t), x, y))
@@ -165,11 +176,16 @@ def t_of_u(samples, target):
 
 def phase_keyframes(samples, moon_a, moon_b):
     """月盘整个进入画面之后才开始换相：先是一枚完整的黑新月停一下，
-    然后一轮阴晴圆缺连续走完，满月正好落在天顶。
-    相位用 1 秒一采样，linear 播放 —— 不再"停一格、跳一格"，那样会一卡一卡的。"""
+    然后连续走完一轮阴晴圆缺，满月正好落在天顶，再一路亏到地平线上才归零。
+
+    形状用两段升余弦拼接：
+      升起 0→94：94·(1-cos(πx))/2
+      落回 94→0：94·(1+cos(πy))/2
+    两段在起点、天顶、终点三处的斜率都是 0，所以既不卡顿也不会在落山前早早黑掉。
+    """
     t_start = t_of_u(samples, U_CLEAR)
-    t_end = t_of_u(samples, 1.0 - U_CLEAR)
-    span = t_end - t_start
+    t_apex = (moon_a + moon_b) / 2.0
+    t_black = moon_b - 2.0          # 快贴到地平线时才全黑
 
     steps = []
 
@@ -181,19 +197,20 @@ def phase_keyframes(samples, moon_a, moon_b):
         base = 240.0 * n
         sign = 1.0 if n % 2 == 0 else -1.0
         add(base + t_start - 0.5, 0.0)
-        last = 0.0
         t = t_start
-        while t <= t_end + 1e-6:
-            ph = (t - t_start) / span
-            # 上升段照常，下降段压缩：让月亮落山时停在凸月而不是亏成全黑，
-            # 否则它会在还悬在天上时就先"看不见"了。
-            sp = ph if ph <= 0.5 else 0.5 + (ph - 0.5) * 0.56
-            off = sign * 94.0 * math.sin(math.pi * sp)
-            last = off
-            add(base + t, off)
+        while t <= t_black + 1e-6:
+            if t <= t_apex:
+                x = (t - t_start) / (t_apex - t_start)
+                val = (1.0 - math.cos(math.pi * x)) / 2.0
+            else:
+                # 下降段用 1 - y^2.2：亮度压得住，直到贴近山脊才迅速收成黑盘。
+                # 天顶处斜率为 0（不突兀），末端斜率不为 0，但那会儿它已经沉到山后了。
+                y = min((t - t_apex) / (t_black - t_apex), 1.0)
+                val = 1.0 - y ** 2.2
+            add(base + t, sign * 94.0 * val)
             t += 1.0
-        add(base + t_end, last)
-        add(base + moon_b, last)      # 保持亮着落下去，归零放到下一轮之前
+        add(base + t_black, 0.0)
+        add(base + moon_b, 0.0)
     add(PHASE_PERIOD, 0.0)
     return "\n".join(f"      {p}% {{ {d} }}" for p, d in steps)
 
@@ -227,10 +244,9 @@ def sun_arc_keyframes():
             x, y = xy(u_of(tt))
             lines.append(line(tt, x, y))
 
-        nxt = A + 240.0 * (n + 1)
+        # 收尾停在落点，下一次过境的第一个采样点会自然把它拉回起点，
+        # 这段位移发生在太阳不可见的时候，不需要额外补关键帧。
         lines.append(line(min(b + 0.5, SUN_PERIOD), X1, YBASE))
-        if nxt < SUN_PERIOD:
-            lines.append(line(nxt, X0, YBASE))
     lines.append(line(SUN_PERIOD, X0, YBASE))
     return "\n".join(lines)
 
@@ -324,6 +340,23 @@ EXTRA_DEFS = """
       <feGaussianBlur stdDeviation="7" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+    <radialGradient id="blaze" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/>
+      <stop offset="0.10" stop-color="#FFF8DC" stop-opacity="0.80"/>
+      <stop offset="0.28" stop-color="#FFE2A8" stop-opacity="0.42"/>
+      <stop offset="0.55" stop-color="#FFC286" stop-opacity="0.16"/>
+      <stop offset="0.8" stop-color="#FFB274" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#FFB274" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="raySoft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.2"/>
+    </filter>
+    <radialGradient id="holyWash" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFF4D4" stop-opacity="0.30"/>
+      <stop offset="0.5" stop-color="#FFEBB8" stop-opacity="0.20"/>
+      <stop offset="0.82" stop-color="#FFE3A6" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#FFE3A6" stop-opacity="0"/>
+    </radialGradient>
     <radialGradient id="pentAura" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#8E0C16" stop-opacity="0.40"/>
       <stop offset="0.55" stop-color="#6E0810" stop-opacity="0.16"/>
@@ -338,7 +371,8 @@ EXTRA_DEFS = """
 # 日全食：城堡上空的十字架，淡金光晕罩住整座城堡
 HOLY_CROSS = """
   <g class="holyCross" opacity="0">
-    <circle cx="990" cy="142" r="176" fill="url(#holyHalo)"/>
+    <ellipse cx="990" cy="222" rx="146" ry="116" fill="url(#holyWash)"/>
+    <circle cx="990" cy="142" r="196" fill="url(#holyHalo)"/>
     <g filter="url(#holyGlow)" fill="#FFF6DC">
       <rect x="981" y="28" width="18" height="116" rx="3"/>
       <rect x="933" y="66" width="114" height="18" rx="3"/>
@@ -346,6 +380,28 @@ HOLY_CROSS = """
     <g fill="#FFFFFF" opacity="0.6">
       <rect x="986" y="33" width="8" height="106" rx="2"/>
       <rect x="938" y="71" width="104" height="8" rx="2"/>
+    </g>
+  </g>
+"""
+
+# 破晓：盖在夜层之上的强光，暗风景里一轮亮太阳
+SUN_BLAZE = """
+  <g class="sunBlaze" opacity="0">
+    <circle cx="882" cy="150" r="252" fill="url(#blaze)"/>
+    <g stroke="#FFF6E0" stroke-width="2.6" stroke-linecap="round"
+       filter="url(#raySoft)" opacity="0.55">
+      <line x1="936.1" y1="164.5" x2="1025.0" y2="188.3"/>
+      <line x1="921.6" y1="189.6" x2="996.6" y2="264.6"/>
+      <line x1="896.5" y1="204.1" x2="920.3" y2="293.0"/>
+      <line x1="867.5" y1="204.1" x2="840.1" y2="306.5"/>
+      <line x1="842.4" y1="189.6" x2="777.3" y2="254.7"/>
+      <line x1="827.9" y1="164.5" x2="725.5" y2="191.9"/>
+      <line x1="827.9" y1="135.5" x2="739.0" y2="111.7"/>
+      <line x1="842.4" y1="110.4" x2="767.4" y2="35.4"/>
+      <line x1="867.5" y1="95.9" x2="843.7" y2="7.0"/>
+      <line x1="896.5" y1="95.9" x2="923.9" y2="-6.5"/>
+      <line x1="921.6" y1="110.4" x2="986.7" y2="45.3"/>
+      <line x1="936.1" y1="135.5" x2="1038.5" y2="108.1"/>
     </g>
   </g>
 """
@@ -401,6 +457,13 @@ def remap_p(p):
 
 
 def remap_block(block):
+    """把 128s 时间轴上的百分比整体搬到 240s 上。
+
+    关键点：原来写 `0%, 9.6% { ... }` 的，重映射后 0% 会被挪到 50.8%，
+    于是这个动画就没有 0% 关键帧了。缺 0% 时浏览器会拿元素自身的属性值补位
+    （opacity 默认 1、transform 默认 none），结果白天也能看见狼人、棺材、裂缝。
+    所以重映射之后必须显式补回 0% / 100%。
+    """
     def rep(m):
         ind, p1, p2, tail = m.group(1), m.group(2), m.group(3), m.group(4)
         n1 = remap_p(float(p1))
@@ -409,7 +472,23 @@ def remap_block(block):
         n2 = remap_p(float(p2))
         return "%s%s%%, %s%%%s" % (ind, fmt(n1), fmt(n2), tail)
 
-    return re.sub(r"^(\s*)([\d.]+)%(?:\s*,\s*([\d.]+)%)?(\s*\{)", rep, block, flags=re.M)
+    mapped = re.sub(r"^(\s*)([\d.]+)%(?:\s*,\s*([\d.]+)%)?(\s*\{)", rep, block, flags=re.M)
+
+    pairs = []
+    for chunk in mapped.split("}"):
+        if "{" not in chunk:
+            continue
+        sel, decl = chunk.rsplit("{", 1)
+        for x in re.findall(r"([\d.]+)%", sel):
+            pairs.append((float(x), decl.strip()))
+    if not pairs:
+        return mapped
+    pairs.sort(key=lambda t: t[0])
+    if pairs[0][0] != 0.0:
+        pairs.insert(0, (0.0, pairs[0][1]))
+    if pairs[-1][0] != 100.0:
+        pairs.append((100.0, pairs[-1][1]))
+    return "\n" + "\n".join("      %s%% { %s }" % (fmt(p), d) for p, d in pairs) + "\n    "
 
 
 DARK_TIMED = ["wolfHowl", "wolfShow", "wereShow", "crackShow", "coffinRise",
@@ -515,9 +594,23 @@ def main():
     lstyle = lstyle.replace("corona 384s", "corona 720s")
 
     lstyle = prefix_css(lstyle)
+    # 旧的日食关键帧和规则已被 new_css 里 2160s 的三食相版本取代
+    for _nm in ("l-eclipse", "l-eclipseDim", "l-corona"):
+        lstyle = drop_kf(lstyle, _nm)
+    for _cls in ("l-eclX", "l-eclDim", "l-corona"):
+        lstyle = re.sub(r"\." + _cls + r"\s*\{[^}]*\}", "", lstyle)
     ldefs = prefix_markup(ldefs)
     lbody = prefix_markup(lbody)
+
+    # 两座城堡原本差 7px 高度（夜 277 / 昼 284），交叉淡入淡出时会看出重影。
+    # 统一到 280.5：各自离自己的山脊只差 3.5px，看不出来，但重影没了。
+    dbody = dbody.replace("translate(990,277) scale(1.12) translate(-990,-277)",
+                          "translate(990,280.5) scale(1.12) translate(-990,-280.5)")
+    lbody = lbody.replace("translate(990,284) scale(1.12) translate(-990,-284)",
+                          "translate(990,280.5) scale(1.12) translate(-990,-280.5)")
     lbody = lbody.replace('<g class="l-deerwalk">', '<g class="l-deerwalk dn-day">', 1)
+
+    dstyle = drop_kf(dstyle, "duskBand")     # 新版在 new_css 里，旧的删掉避免重复定义
 
     # ---- 时长统一：128s -> 240s
     dstyle = dstyle.replace("128s", "240s")
@@ -554,6 +647,18 @@ def main():
     css.append("    }")
 
     css.append(kfs("fadeSun", sun_fade_keyframes()))
+
+    blaze = [("0", "opacity: 0")]
+    for n in range(9):
+        a = A + 240.0 * n
+        blaze += [(pct(a, SUN_PERIOD), "opacity: 0"),
+                  (pct(a + 3, SUN_PERIOD), "opacity: 1"),
+                  (pct(a + 9, SUN_PERIOD), "opacity: .85"),
+                  (pct(a + 18, SUN_PERIOD), "opacity: .42"),
+                  (pct(a + 28, SUN_PERIOD), "opacity: .10"),
+                  (pct(a + 38, SUN_PERIOD), "opacity: 0")]
+    blaze.append(("100", "opacity: 0"))
+    css.append(kfs("blazeIn", blaze))
     fade_m = [(0.0, 0.0), (MOON_A, 0.0), (MOON_A + 1.5, 1.0),
               (MOON_B - 1.5, 1.0), (MOON_B, 0.0), (T, 0.0)]
     css.append(kfs("fadeMoon", [(pct(t), f"opacity: {fmt(o)}") for t, o in fade_m]))
@@ -616,6 +721,7 @@ def main():
 
     css.append("    .nightScene { animation: nightIn 240s linear infinite }")
     css.append("    .l-sunwrap { animation: arcSun 2160s linear infinite, fadeSun 2160s linear infinite }")
+    css.append("    .sunBlaze { animation: arcSun 2160s linear infinite, blazeIn 2160s linear infinite }")
     css.append("    .moonArc { animation: arcMoon 240s linear infinite, fadeMoon 240s linear infinite }")
     css.append("    .l-sunwash { animation: sunFade 240s linear infinite }")
     css.append(kfs("dawnBand240", [
@@ -708,7 +814,7 @@ def main():
         "日落反过来：太阳往下沉，天色跟着暗，一落到山脊后面就全黑，不留尾巴。"
         "全黑之后隔六秒，第 104 秒月亮就从东边起来了——先是一枚完整的黑新月，"
         "等它整个越过远山、圆盘完整地悬在画面上，相位才开始连续地转："
-        "渐渐亮成蛾眉、上弦、凸月，到天顶时正好是满月，再一路亏成凸月落下；相邻两次过境明暗左右交替。"
+        "渐渐亮成蛾眉、上弦、凸月，到天顶时正好是满月，再一路亏回新月落下；相邻两次过境明暗左右交替。"
         "月全食不是每夜都有，隔一个满月才来一次，铜红缓缓浸透月盘再退去。"
         "日食分三种，轮流出现：正午月亮正对太阳是日全食，从太阳上方掠过是大半食，擦过边缘是小半食。"
         "日食时城堡上空浮起一座发光的十字架，淡金光晕笼住整座城堡：全食最盛，半食只是淡淡一道，食尽即散。"
@@ -736,6 +842,7 @@ def main():
     out.append('  <g class="nightScene">')
     out.append(dbody)
     out.append("  </g>")
+    out.append(SUN_BLAZE)
     out.append("</svg>")
     svg = "\n".join(out)
 

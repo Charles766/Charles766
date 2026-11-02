@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@fb83716ab034be271a9b38922ae4f279d0f41780/assets/banner.svg" alt="山野一日" width="100%">
+  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@853d07cebdcb3c5b5d04a37fde167a9c37ac4196/assets/banner.svg" alt="山野一日" width="100%">
 </p>
 
 
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=600&size=40&duration=3200&pause=1400&color=F2A0B5&center=true&vCenter=true&width=620&lines=Charles">
-    <img alt="Charles" src="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=600&size=40&duration=3200&pause=1400&color=D96C8E&center=true&vCenter=true&width=620&lines=Charles">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/name-dark.svg">
+    <img alt="Charles" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/name-light.svg" width="620">
   </picture>
 </p>
 
@@ -59,8 +59,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=bccede4b">
-    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=bccede4b" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=20261101a">
+    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=20261101a" width="100%">
   </picture>
 </p>
 
