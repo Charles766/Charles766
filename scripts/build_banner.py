@@ -20,8 +20,10 @@ ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "assets"
 
 T = 240.0            # 主时钟
-A, B = 2.0, 98.0     # 单次过境区间
+A, B = 2.0, 98.0     # 太阳过境区间
 APEX = (A + B) / 2.0
+MOON_A, MOON_B = 104.0, 220.0   # 月亮过境：日落即全黑，隔 6 秒月亮就起
+MOON_APEX = (MOON_A + MOON_B) / 2.0
 X0, X1 = 60.0, 1140.0
 YBASE, HEIGHT = 318.0, 244.0
 
@@ -29,11 +31,8 @@ SUN_BASE = (882.0, 150.0)
 MOON_BASE = (878.0, 120.0)
 
 LUNATION = 480.0     # 月相周期
-FULL_AT = 170.0      # 满月 = 天顶
-NEW_AT = FULL_AT + LUNATION / 2.0   # 410s，下一轮天顶，正好新月
-
-DUSK_IN = (98.0, 122.0)     # 夜色淡入
-DAWN_OUT = (220.0, 240.0)   # 夜色淡出
+FULL_AT = MOON_APEX  # 满月 = 天顶
+NEW_AT = FULL_AT + LUNATION / 2.0   # 下一轮天顶，正好新月
 
 
 # ---------------------------------------------------------------- 工具
@@ -89,23 +88,26 @@ def replace_kf(css, name, new_block):
 
 # ---------------------------------------------------------------- 弧线
 
-def build_arc():
-    """按速度曲线积分，得到 u(t)，再映射到正弦弧上。"""
+def build_arc(a=None, b=None):
+    """按速度曲线积分，得到 u(t)，再映射到正弦弧上。a/b 可覆盖默认的日出日落区间。"""
+    a = A if a is None else a
+    b = B if b is None else b
+    apex = (a + b) / 2.0
     k_slow, w_slow = 0.94, 3.2
     N = 4000
-    ts = [A + (B - A) * i / N for i in range(N + 1)]
-    sp = [1.0 - k_slow * math.exp(-((t - APEX) / w_slow) ** 2) for t in ts]
+    ts = [a + (b - a) * i / N for i in range(N + 1)]
+    sp = [1.0 - k_slow * math.exp(-((t - apex) / w_slow) ** 2) for t in ts]
     cum = [0.0]
     for i in range(1, N + 1):
-        cum.append(cum[-1] + (sp[i] + sp[i - 1]) * 0.5 * (B - A) / N)
+        cum.append(cum[-1] + (sp[i] + sp[i - 1]) * 0.5 * (b - a) / N)
     total = cum[-1]
 
     def u_of(t):
-        if t <= A:
+        if t <= a:
             return 0.0
-        if t >= B:
+        if t >= b:
             return 1.0
-        i = (t - A) / (B - A) * N
+        i = (t - a) / (b - a) * N
         j = int(i)
         f = i - j
         j2 = min(j + 1, N)
@@ -114,38 +116,56 @@ def build_arc():
     def xy(u):
         return X0 + (X1 - X0) * u, YBASE - HEIGHT * math.sin(math.pi * u)
 
-    samples = [(A, u_of(A))]
-    t = A
-    while t + 1.0 < B:
+    samples = [(a, u_of(a))]
+    t = a
+    while t + 1.0 < b:
         t += 1.0
         samples.append((t, u_of(t)))
-    samples.append((B, 1.0))
+    samples.append((b, 1.0))
     return samples, xy, u_of
 
 
-def arc_keyframes(name, base, samples, xy):
+def arc_keyframes(name, base, samples, xy, a=None, b=None):
+    a = A if a is None else a
+    b = B if b is None else b
+
     def line(p, x, y):
         return f"      {p}% {{ transform: translate({fmt(x - base[0])}px, {fmt(y - base[1])}px) }}"
 
-    lines = [line("0", X0, YBASE), line(pct(A), X0, YBASE)]
+    lines = [line("0", X0, YBASE), line(pct(a), X0, YBASE)]
     for t, u in samples[1:-1]:
         x, y = xy(u)
         lines.append(line(pct(t), x, y))
     xe, ye = xy(1.0)
-    lines.append(line(pct(B), xe, ye))
+    lines.append(line(pct(b), xe, ye))
     lines.append(line("100", xe, ye))
     return "\n".join(lines)
 
 
 SEGMENTS = 30          # 一次过境切 30 段，每段一个相位
-SEG_LEN = 96.0 / SEGMENTS
 PHASE_PERIOD = 480.0   # 两次过境一个循环，明暗方向左右交替
+U_CLEAR = 0.21         # 月盘整个越过远山山脊时的 u（此时才算"全部出现在画面中"）
 
 
-def phase_keyframes():
-    """一次过境（96s）走完一轮阴晴圆缺，切成 30 段。
-    每段固定一个相位，停 2.7s，再用 0.5s 跳到下一格 —— 相位是"换"的，不是一直"流"的。
-    阴影盘 offset：0 = 全遮（新月），±94 = 全露（满月）。"""
+def t_of_u(samples, target):
+    """在 u(t) 采样表上反查时间。"""
+    for i in range(len(samples) - 1):
+        t0, u0 = samples[i]
+        t1, u1 = samples[i + 1]
+        if u0 <= target <= u1:
+            f = 0.0 if u1 == u0 else (target - u0) / (u1 - u0)
+            return t0 + (t1 - t0) * f
+    return samples[-1][0]
+
+
+def phase_keyframes(samples, moon_a, moon_b):
+    """月盘整个进入画面之后才开始换相：先是一枚完整的黑新月停一下，
+    然后一轮阴晴圆缺连续走完，满月正好落在天顶。
+    相位用 1 秒一采样，linear 播放 —— 不再"停一格、跳一格"，那样会一卡一卡的。"""
+    t_start = t_of_u(samples, U_CLEAR)
+    t_end = t_of_u(samples, 1.0 - U_CLEAR)
+    span = t_end - t_start
+
     steps = []
 
     def add(t, off):
@@ -153,15 +173,17 @@ def phase_keyframes():
 
     add(0.0, 0.0)
     for n in range(2):
-        start = 122.0 + 240.0 * n
+        base = 240.0 * n
         sign = 1.0 if n % 2 == 0 else -1.0
-        add(start - 0.4, 0.0)
-        for k in range(SEGMENTS):
-            t0 = start + k * SEG_LEN
-            off = sign * 94.0 * math.sin(math.pi * (k + 0.5) / SEGMENTS)
-            add(t0, off)
-            add(t0 + 2.7, off)
-        add(start + 96.0, 0.0)
+        add(base + t_start - 0.5, 0.0)
+        t = t_start
+        while t <= t_end + 1e-6:
+            ph = (t - t_start) / span
+            off = sign * 94.0 * math.sin(math.pi * ph)
+            add(base + t, off)
+            t += 1.0
+        add(base + t_end, 0.0)
+        add(base + moon_b, 0.0)
     add(PHASE_PERIOD, 0.0)
     return "\n".join(f"      {p}% {{ {d} }}" for p, d in steps)
 
@@ -228,6 +250,72 @@ def solar_dim():
               (pct(1502, ECL_PERIOD), "opacity: 0")]
     steps.append(("100", "opacity: 0"))
     return steps
+
+
+# ---------------------------------------------------------------- 日食 / 月食 的符号
+
+EXTRA_DEFS = """
+    <radialGradient id="holyHalo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFF6D8" stop-opacity="0.40"/>
+      <stop offset="0.34" stop-color="#FFE9B4" stop-opacity="0.19"/>
+      <stop offset="0.68" stop-color="#FFDD9E" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#FFDD9E" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="holyGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="pentAura" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#8E0C16" stop-opacity="0.40"/>
+      <stop offset="0.55" stop-color="#6E0810" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#6E0810" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="pentGlow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+"""
+
+# 日全食：城堡上空的十字架，淡金光晕罩住整座城堡
+HOLY_CROSS = """
+  <g class="holyCross" opacity="0">
+    <circle cx="990" cy="142" r="176" fill="url(#holyHalo)"/>
+    <g filter="url(#holyGlow)" fill="#FFF6DC">
+      <rect x="981" y="28" width="18" height="116" rx="3"/>
+      <rect x="933" y="66" width="114" height="18" rx="3"/>
+    </g>
+    <g fill="#FFFFFF" opacity="0.6">
+      <rect x="986" y="33" width="8" height="106" rx="2"/>
+      <rect x="938" y="71" width="104" height="8" rx="2"/>
+    </g>
+  </g>
+"""
+
+# 月全食：血红倒五角星，里面隐约一个黑山羊头
+PENTAGRAM = """
+  <g class="pentagram" opacity="0">
+    <g class="pentScale">
+      <circle cx="990" cy="120" r="124" fill="url(#pentAura)"/>
+      <g filter="url(#pentGlow)">
+        <path d="M990 216 L934.2 43.2 L1080.4 149.4 L899.6 149.4 L1045.8 43.2 Z"
+              fill="none" stroke="#B3121E" stroke-width="6.5" stroke-linejoin="miter"/>
+        <circle cx="990" cy="120" r="101" fill="none" stroke="#B3121E"
+                stroke-width="2.4" opacity="0.5"/>
+      </g>
+      <g class="goatHead" opacity="0.5" transform="translate(990,120)">
+        <g fill="none" stroke="#0A0407" stroke-width="7" stroke-linecap="round">
+          <path d="M-13 -16 C-29 -24 -37 -40 -33 -56"/>
+          <path d="M13 -16 C29 -24 37 -40 33 -56"/>
+        </g>
+        <path d="M-19 -6 L-33 -1 L-19 5 Z" fill="#0A0407"/>
+        <path d="M19 -6 L33 -1 L19 5 Z" fill="#0A0407"/>
+        <path d="M0 -24 C13 -24 21 -13 20 0 C19 13 10 24 0 34 C-10 24 -19 13 -20 0 C-21 -13 -13 -24 0 -24 Z" fill="#0A0407"/>
+        <ellipse cx="-10" cy="-2" rx="4" ry="2" fill="#D0182A" opacity="0.85" transform="rotate(-14 -10 -2)"/>
+        <ellipse cx="10" cy="-2" rx="4" ry="2" fill="#D0182A" opacity="0.85" transform="rotate(14 10 -2)"/>
+      </g>
+    </g>
+  </g>
+"""
 
 
 # ---------------------------------------------------------------- 暗版时间轴重映射
@@ -314,6 +402,7 @@ def main():
     ldefs, lstyle, lbody = split_svg(light)
 
     samples, xy, _ = build_arc()
+    moon_samples, _, _ = build_arc(MOON_A, MOON_B)
 
     # ---- 暗版：重映射月亮相关时间轴
     for nm in DARK_TIMED:
@@ -369,12 +458,18 @@ def main():
     lstyle = prefix_css(lstyle)
     ldefs = prefix_markup(ldefs)
     lbody = prefix_markup(lbody)
+    lbody = lbody.replace('<g class="l-deerwalk">', '<g class="l-deerwalk dn-day">', 1)
 
     # ---- 时长统一：128s -> 240s
     dstyle = dstyle.replace("128s", "240s")
     lstyle = lstyle.replace("128s", "240s")
 
     # ---- 暗版：月食改成"慢慢变红"
+    dbody = dbody.replace(
+        '<g class="wolf" transform="translate(268,304.5) scale(1.0)">',
+        '<g class="dn-night">\n  <g class="wolf" transform="translate(268,304.5) scale(1.0)">', 1)
+    dbody = dbody.replace('\n    <rect class="eclDimM"', '\n  </g>\n    <rect class="eclDimM"', 1)
+
     dbody = dbody.replace(
         '<circle class="eclMoon" cx="878" cy="120" r="46" fill="url(#copper)"/>',
         '<circle class="eclMoon" cx="878" cy="120" r="46" fill="url(#copper)" opacity="0"/>',
@@ -396,42 +491,55 @@ def main():
     css.append(arc_keyframes("arcSun", SUN_BASE, samples, xy))
     css.append("    }")
     css.append("    @keyframes arcMoon {")
-    css.append(arc_keyframes("arcMoon", MOON_BASE, samples, xy))
+    css.append(arc_keyframes("arcMoon", MOON_BASE, moon_samples, xy, MOON_A, MOON_B))
     css.append("    }")
 
     fade = [(0.0, 0.0), (A, 0.0), (A + 1.5, 1.0), (B - 1.5, 1.0), (B, 0.0), (T, 0.0)]
     css.append(kfs("bodyFade", [(pct(t), f"opacity: {fmt(o)}") for t, o in fade]))
+    fade_m = [(0.0, 0.0), (MOON_A, 0.0), (MOON_A + 1.5, 1.0),
+              (MOON_B - 1.5, 1.0), (MOON_B, 0.0), (T, 0.0)]
+    css.append(kfs("fadeMoon", [(pct(t), f"opacity: {fmt(o)}") for t, o in fade_m]))
+    # 夜色浓度跟着太阳高度走，而且太阳一落到底就全黑，不再拖到月出。
     css.append(kfs("nightIn", [
-        ("0", "opacity: 0"),
-        (pct(DUSK_IN[0]), "opacity: 0"),
-        (pct(DUSK_IN[1]), "opacity: 1"),
-        (pct(DAWN_OUT[0]), "opacity: 1"),
-        ("100", "opacity: 0"),
+        ("0", "opacity: .90"),
+        (pct(2), "opacity: .86"),      # 日出
+        (pct(10), "opacity: .45"),
+        (pct(18), "opacity: .15"),
+        (pct(28), "opacity: 0"),
+        (pct(70), "opacity: 0"),
+        (pct(82), "opacity: .18"),
+        (pct(88), "opacity: .45"),
+        (pct(94), "opacity: .78"),
+        (pct(98), "opacity: 1"),       # 日落即全黑
+        (pct(216), "opacity: 1"),
+        (pct(232), "opacity: .94"),
+        ("100", "opacity: .90"),
     ]))
     css.append(kfs("duskBand", [
         ("0", "opacity: .9"), ("41", "opacity: .9"), ("56", "opacity: 0"),
         ("84", "opacity: 0"), ("96", "opacity: .55"), ("100", "opacity: .9"),
     ]))
     css.append("    @keyframes mphaseNew {")
-    css.append(phase_keyframes())
+    css.append(phase_keyframes(moon_samples, MOON_A, MOON_B))
     css.append("    }")
     L = LUNATION * 2        # 月食隔一个满月一次
+    F = FULL_AT
     css.append(kfs("eclRed", [
         ("0", "opacity: 0"),
-        (pct(132, L), "opacity: 0"),
-        (pct(158, L), "opacity: .5"),
-        (pct(168, L), "opacity: 1"),
-        (pct(178, L), "opacity: 1"),
-        (pct(197, L), "opacity: .42"),
-        (pct(212, L), "opacity: 0"),
+        (pct(F - 30, L), "opacity: 0"),
+        (pct(F - 6, L), "opacity: .5"),
+        (pct(F - 2, L), "opacity: 1"),
+        (pct(F + 10, L), "opacity: 1"),
+        (pct(F + 28, L), "opacity: .42"),
+        (pct(F + 42, L), "opacity: 0"),
         ("100", "opacity: 0"),
     ]))
     css.append(kfs("eclSceneDim", [
         ("0", "opacity: 0"),
-        (pct(140, L), "opacity: 0"),
-        (pct(166, L), "opacity: .15"),
-        (pct(180, L), "opacity: .15"),
-        (pct(206, L), "opacity: 0"),
+        (pct(F - 22, L), "opacity: 0"),
+        (pct(F - 4, L), "opacity: .15"),
+        (pct(F + 10, L), "opacity: .15"),
+        (pct(F + 38, L), "opacity: 0"),
         ("100", "opacity: 0"),
     ]))
     css.append(kfs("moonDimNew", [
@@ -446,7 +554,7 @@ def main():
 
     css.append("    .nightScene { animation: nightIn 240s linear infinite }")
     css.append("    .l-sunwrap { animation: arcSun 240s linear infinite, bodyFade 240s linear infinite }")
-    css.append("    .moonArc { animation: arcMoon 240s linear infinite -120s, bodyFade 240s linear infinite -120s }")
+    css.append("    .moonArc { animation: arcMoon 240s linear infinite, fadeMoon 240s linear infinite }")
     css.append("    .l-sunwash { animation: sunFade 240s linear infinite }")
     css.append(kfs("dawnBand240", [
         ("0", "opacity: .9"), ("20.8", "opacity: 0"), ("40.8", "opacity: .9"), ("100", "opacity: .9"),
@@ -455,12 +563,12 @@ def main():
     css.append("    .duskBand { animation: duskBand 240s ease-in-out infinite }")
     css.append(kfs("eclDarken", [
         ("0", "opacity: 0"),
-        (pct(132, L), "opacity: 0"),
-        (pct(152, L), "opacity: .12"),
-        (pct(168, L), "opacity: .46"),
-        (pct(178, L), "opacity: .46"),
-        (pct(197, L), "opacity: .12"),
-        (pct(212, L), "opacity: 0"),
+        (pct(F - 30, L), "opacity: 0"),
+        (pct(F - 10, L), "opacity: .12"),
+        (pct(F - 2, L), "opacity: .46"),
+        (pct(F + 10, L), "opacity: .46"),
+        (pct(F + 28, L), "opacity: .12"),
+        (pct(F + 42, L), "opacity: 0"),
         ("100", "opacity: 0"),
     ]))
     css.append("    .mphase { animation: mphaseNew 480s linear infinite }")
@@ -475,18 +583,70 @@ def main():
     css.append("    .eclMoon { animation: eclRed 960s linear infinite }")
     css.append("    .eclDimM { animation: eclSceneDim 960s linear infinite; pointer-events: none }")
     css.append("    .moonDim { animation: moonDimNew 240s linear infinite }")
+    css.append(kfs("dnDay", [
+        ("0", "opacity: 0"), (pct(12), "opacity: 1"), ("35", "opacity: 1"),
+        ("40", "opacity: 0"), ("100", "opacity: 0"),
+    ]))
+    css.append(kfs("dnNight", [
+        ("0", "opacity: 0"), (pct(100), "opacity: 0"), (pct(114), "opacity: 1"),
+        (pct(214), "opacity: 1"), (pct(230), "opacity: 0"), ("100", "opacity: 0"),
+    ]))
+    css.append("    .dn-day { animation: dnDay 240s linear infinite }")
+    css.append("    .dn-night { animation: dnNight 240s linear infinite }")
+
+    # 日全食的十字架：跟着日食窗口走，食尽即散
+    css.append(kfs("holyCrossIn", [
+        ("0", "opacity: 0"),
+        (pct(42, ECL_PERIOD), "opacity: 0"),
+        (pct(48, ECL_PERIOD), "opacity: 1"),
+        (pct(56, ECL_PERIOD), "opacity: 1"),
+        (pct(64, ECL_PERIOD), "opacity: 0"),
+        ("100", "opacity: 0"),
+    ]))
+    css.append("    .holyCross { animation: holyCrossIn 2160s linear infinite }")
+
+    # 月全食的倒五角星：铜红最浓时浮现，褪色时散去
+    css.append(kfs("pentIn", [
+        ("0", "opacity: 0"),
+        (pct(F - 24, L), "opacity: 0"),
+        (pct(F - 4, L), "opacity: .8"),
+        (pct(F + 8, L), "opacity: 1"),
+        (pct(F + 22, L), "opacity: .8"),
+        (pct(F + 38, L), "opacity: 0"),
+        ("100", "opacity: 0"),
+    ]))
+    css.append(kfs("pentPop", [
+        ("0", "transform: scale(.86)"),
+        (pct(F - 24, L), "transform: scale(.86)"),
+        (pct(F + 6, L), "transform: scale(1)"),
+        (pct(F + 18, L), "transform: scale(1)"),
+        ("100", "transform: scale(.86)"),
+    ]))
+    css.append("    .pentagram { animation: pentIn 960s linear infinite }")
+    css.append("    .pentScale { transform-box: fill-box; transform-origin: center;"
+               " animation: pentPop 960s ease-out infinite }")
+
+    lbody = lbody + HOLY_CROSS
+    dbody = dbody.replace(
+        '<rect width="1200" height="340" fill="url(#vig)"/>',
+        PENTAGRAM + '\n<rect width="1200" height="340" fill="url(#vig)"/>', 1)
 
     new_css = "\n".join(css)
 
     title = "山野一日"
     desc = (
         "一片会自己换日夜的山野，不随浏览器的深浅色模式切换。"
-        "第 2 秒太阳自东侧山脊升起，沿弧线过天顶——正午在天顶略作停留——第 98 秒西沉；"
-        "天色转暖，暮色里昼层淡出、夜层淡入。"
-        "第 122 秒月亮升起，从升起到落下的 96 秒过境均分成 30 段，每段固定一个月相，"
-        "停约三秒再换下一格：新月升起，满月到天顶，再一路亏回新月落下；相邻两次过境明暗左右交替。"
+        "第 2 秒太阳自东侧山脊升起，沿弧线过天顶——正午在天顶略作停留——第 98 秒西沉。"
+        "天光的浓淡跟着太阳高度走，不是按固定时长切：日出时天还暗着，只剩一层淡光，"
+        "星子、窗火、狼与坟都还在；太阳升高，夜的东西一件件退去——鹿先走，夜行的一批最后才收。"
+        "日落反过来：太阳往下沉，天色跟着暗，一落到山脊后面就全黑，不留尾巴。"
+        "全黑之后隔六秒，第 104 秒月亮就从东边起来了——先是一枚完整的黑新月，"
+        "等它整个越过远山、圆盘完整地悬在画面上，相位才开始连续地转："
+        "渐渐亮成蛾眉、上弦、凸月，到天顶时正好是满月，再一路亏回新月落下；相邻两次过境明暗左右交替。"
         "月全食不是每夜都有，隔一个满月才来一次，铜红缓缓浸透月盘再退去。"
         "日食分三种，轮流出现：正午月亮正对太阳是日全食，从太阳上方掠过是大半食，擦过边缘是小半食。"
+        "日全食那十几秒，城堡上空浮起一座发光的十字架，淡金光晕笼住整座城堡，食尽即散。"
+        "月全食时反过来，城堡上空浮起巨大的血红倒五角星，里面隐约一个黑山羊头，随铜红褪去而消失。"
         "日月都只在过天顶时减速，升起与落下保持匀速，不做停顿。周期 240 秒，首尾无缝。"
     )
 
@@ -497,6 +657,7 @@ def main():
     out.append("  <defs>")
     out.append(ddefs)
     out.append(ldefs)
+    out.append(EXTRA_DEFS)
     out.append("  </defs>")
     out.append("  <style>")
     out.append(dstyle)
