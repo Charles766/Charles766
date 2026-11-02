@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-dark.svg?v=20261102a">
-    <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner-light.svg?v=20261102a" alt="晨光山野" width="100%">
-  </picture>
+  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/banner.svg?v=b03e6489" alt="山野一日" width="100%">
 </p>
 
 
@@ -79,8 +76,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-dark.svg?v=e0bf6951">
-    <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=e0bf6951">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-dark.svg?v=4e1d1c5a">
+    <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=4e1d1c5a">
   </picture>
 </p>
 
