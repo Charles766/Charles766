@@ -353,6 +353,16 @@ EXTRA_DEFS = """
       <stop offset="0.75" stop-color="#FFEFC6" stop-opacity="0.34"/>
       <stop offset="1" stop-color="#FFE3A8" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="rimWarm" x1="0" y1="0" x2="430" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFDCA8" stop-opacity="0.72"/>
+      <stop offset="0.45" stop-color="#FFC88E" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#FFB47A" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="groundWarm" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFDCA8" stop-opacity="0.72"/>
+      <stop offset="0.42" stop-color="#FFC98C" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#FFB87A" stop-opacity="0"/>
+    </radialGradient>
     <radialGradient id="dawnWash" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#FFD9A0" stop-opacity="0.44"/>
       <stop offset="0.5" stop-color="#FFC98E" stop-opacity="0.23"/>
@@ -407,6 +417,16 @@ SUN_BLAZE = """
     <ellipse cx="882" cy="228" rx="392" ry="96" fill="url(#dawnWash)" mask="url(#skyFade)"/>
     <circle cx="882" cy="150" r="188" fill="url(#blaze)"/>
     <circle cx="882" cy="150" r="62" fill="url(#coreGlow)"/>
+  </g>
+"""
+
+
+# 破晓的地面暖光：太阳还没照到，光先在草地和树根上化开。
+# 位置固定在左侧地平线，不跟太阳跑 —— 日出那几十秒里它就该是一整片，不是一个移动的光斑。
+SUN_GROUND = """
+  <g class="sunGround" opacity="0">
+    <ellipse cx="205" cy="324" rx="350" ry="50" fill="url(#groundWarm)"/>
+    <ellipse cx="145" cy="311" rx="180" ry="27" fill="url(#groundWarm)"/>
   </g>
 """
 
@@ -643,6 +663,8 @@ def main():
         body = " ".join(f"{p}% {{ {d} }}" for p, d in steps)
         return f"    @keyframes {name} {{ {body} }}"
 
+    ddefs_extra = ""
+
     css = ["    /* ===== 统一时钟 240s：日月沿同一条弧线，只在过天顶时减速 ===== */"]
     css.append("    @keyframes arcSun {")
     css.append(sun_arc_keyframes())
@@ -731,6 +753,8 @@ def main():
     css.append("    .nightScene { animation: nightIn 240s linear infinite }")
     css.append("    .l-sunwrap { animation: arcSun 2160s linear infinite, fadeSun 2160s linear infinite }")
     css.append("    .sunBlaze { animation: arcSun 2160s linear infinite, blazeIn 2160s linear infinite }")
+    css.append("    .sunGround { animation: blazeIn 2160s linear infinite }")
+    css.append("    .treeRim { animation: blazeIn 2160s linear infinite }")
     css.append("    .moonArc { animation: arcMoon 240s linear infinite, fadeMoon 240s linear infinite }")
     css.append("    .l-sunwash { animation: sunFade 240s linear infinite }")
     css.append(kfs("dawnBand240", [
@@ -836,6 +860,39 @@ def main():
     assert ridge in dbody, "找不到远山山脊，破晓光没处插"
     dbody = dbody.replace(ridge, SUN_BLAZE + "\n" + ridge, 1)
 
+    # 地面暖光放在近景地形之后、草丛之前：地面被照亮，草叶仍是暗的，才有前后。
+    grass = '  <g opacity="0.97">'
+    assert grass in dbody, "找不到草丛，地面暖光没处插"
+    dbody = dbody.replace(grass, SUN_GROUND + "\n" + grass, 1)
+
+    # 前景高树的暖边：草丛组里混着大松树和小草，只挑"够高"的路径复制一份描边，
+    # 小草太细，描上去就糊成一团了。
+    gstart = dbody.index(grass)
+    gend = dbody.index("\n  </g>", gstart) + len("\n  </g>")
+    tall = []
+    for line in dbody[gstart:gend].splitlines():
+        t = line.strip()
+        if not t.startswith("<path"):
+            continue
+        ys = [float(m.group(2)) for m in re.finditer(r"(-?[\d.]+)[ ,](-?[\d.]+)", t)]
+        if ys and min(ys) < 282:
+            tall.append("    " + t)
+    assert tall, "没挑到高树"
+
+    # 描边裁在树形内部：只留内侧那一半，看上去才是"光打在树的边上"，
+    # 而不是给树描了一圈粗轮廓。
+    ds = []
+    for t in tall:
+        m = re.search(r'\sd="([^"]+)"', t)
+        if m:
+            ds.append('    <path d="%s"/>' % m.group(1))
+    clip = ('  <clipPath id="treeRimClip">\n' + "\n".join(ds) + "\n  </clipPath>")
+    rim = ('  <g class="treeRim" clip-path="url(#treeRimClip)" fill="none"\n'
+           '     stroke="url(#rimWarm)" stroke-width="2.1" stroke-linejoin="round" opacity="0">\n'
+           + "\n".join(tall) + "\n  </g>")
+    dbody = dbody[:gend] + "\n" + rim + dbody[gend:]
+    ddefs_extra = clip
+
     out.append('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" width="2400" height="680" role="img">')
     out.append("  <title>%s</title>" % title)
     out.append("  <desc>%s</desc>" % desc)
@@ -843,6 +900,8 @@ def main():
     out.append(ddefs)
     out.append(ldefs)
     out.append(EXTRA_DEFS)
+    if ddefs_extra:
+        out.append(ddefs_extra)
     out.append("  </defs>")
     out.append("  <style>")
     out.append(dstyle)
