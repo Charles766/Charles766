@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@853d07cebdcb3c5b5d04a37fde167a9c37ac4196/assets/banner.svg" alt="山野一日" width="100%">
+  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@48a555acab3c2870d2a84a9e3eaf3292821874a3/assets/banner.svg" alt="山野一日" width="100%">
 </p>
 
 
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/name-dark.svg">
-    <img alt="Charles" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/name-light.svg" width="620">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@e82518e6d604fc8b67a777d853ddc2e43987360a/assets/name-dark.svg">
+    <img alt="Charles" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@e82518e6d604fc8b67a777d853ddc2e43987360a/assets/name-light.svg" width="620">
   </picture>
 </p>
 
