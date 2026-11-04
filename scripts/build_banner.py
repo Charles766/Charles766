@@ -179,18 +179,27 @@ def t_of_u(samples, target):
 
 
 def phase_keyframes(samples, moon_a, moon_b):
-    """月相：480s 一轮，两次过境各在天顶圆满一次。
+    """月相：480s 一轮。
 
-    以前用的是 0→94→0 的包络 —— 月亮升起时是黑盘、落下时又黑回去，
-    看着像被地平线一口口吃掉。改成余弦之后，升起时已经亮了大半，
-    天顶最圆，落下时还剩五成以上；真正的"朔"落在 t=50 / 290，
-    那会儿月亮在地平线以下，画面上根本没有它。
+    几何（已确认）：mphase 阴影圆 r=46，translateX=0 时完全盖住月盘（新月/暗），
+    translateX=94 时移出裁剪（满月/亮）。所以 val 要映射到"天顶 val=1、朔 val=0"。
 
-    亮面左右交替：符号在两次朔处翻转（那时偏移正好是 0），所以接缝看不出来。
+    用 (1 + cos)/2：天顶(170) 时 val=1 → X=94 → 满月；升起(104)/落下(236) 时
+    val≈0.42 → X≈39，半亮偏多（非新月）；真正的"朔"(val=0, X=0 暗盘) 只落在
+    t=50 / 290，那会儿月亮在地平线以下，画面上根本看不见。
+
+    关键：月食窗口(约 148~207s)内把月相**锁定为满月(val=1 → X=94)**。否则月相阴影会
+    和铜色扫光(eclSweep)同时作用在月亮上——月食还没散，月相就已经在动，
+    两个明暗边界打架。月食本就只在满月时发生，锁满月在物理上也站得住。
+    亮面左右交替的翻转仍由 sign 负责，锁定期 |X|=94 不受符号影响。
     """
+    ECL_HOLD_LO, ECL_HOLD_HI = 148.0, 207.0
     steps = []
     for t in range(0, int(PHASE_PERIOD) + 1, 2):
-        val = (1.0 + math.cos(2.0 * math.pi * (t - MOON_APEX) / 240.0)) / 2.0
+        if ECL_HOLD_LO <= t <= ECL_HOLD_HI:
+            val = 1.0                       # 月食期间锁定满月(X=94)，不与扫光争抢
+        else:
+            val = (1.0 + math.cos(2.0 * math.pi * (t - MOON_APEX) / 240.0)) / 2.0
         sign = 1.0 if ((t - 50.0) % PHASE_PERIOD) < 240.0 else -1.0
         steps.append((pct(t, PHASE_PERIOD),
                       "transform: translateX(%spx)" % fmt(sign * 94.0 * val)))
