@@ -32,7 +32,11 @@ YBASE, HEIGHT = 318.0, 244.0
 SUN_BASE = (882.0, 150.0)
 MOON_BASE = (878.0, 120.0)
 
+FULL_IN, FULL_OUT = 148.0, 204.0   # 满月平台：148s 圆，204s 才开始亏
+
 LUNATION = 480.0     # 月相周期
+ECL = LUNATION * 2.0  # 月全食隔一个满月一次 = 960s。夜行生物必须挂在这个时钟上，
+                      # 否则 240s 的夜循环会让它们每晚都出来，而不是只在月食夜。
 FULL_AT = MOON_APEX  # 满月 = 天顶
 NEW_AT = FULL_AT + LUNATION / 2.0   # 下一轮天顶，正好新月
 
@@ -175,44 +179,22 @@ def t_of_u(samples, target):
 
 
 def phase_keyframes(samples, moon_a, moon_b):
-    """月盘整个进入画面之后才开始换相：先是一枚完整的黑新月停一下，
-    然后连续走完一轮阴晴圆缺，满月正好落在天顶，再一路亏到地平线上才归零。
+    """月相：480s 一轮，两次过境各在天顶圆满一次。
 
-    形状用两段升余弦拼接：
-      升起 0→94：94·(1-cos(πx))/2
-      落回 94→0：94·(1+cos(πy))/2
-    两段在起点、天顶、终点三处的斜率都是 0，所以既不卡顿也不会在落山前早早黑掉。
+    以前用的是 0→94→0 的包络 —— 月亮升起时是黑盘、落下时又黑回去，
+    看着像被地平线一口口吃掉。改成余弦之后，升起时已经亮了大半，
+    天顶最圆，落下时还剩五成以上；真正的"朔"落在 t=50 / 290，
+    那会儿月亮在地平线以下，画面上根本没有它。
+
+    亮面左右交替：符号在两次朔处翻转（那时偏移正好是 0），所以接缝看不出来。
     """
-    t_start = t_of_u(samples, U_CLEAR)
-    t_apex = (moon_a + moon_b) / 2.0
-    t_black = moon_b - 2.0          # 快贴到地平线时才全黑
-
     steps = []
-
-    def add(t, off):
-        steps.append((pct(t, PHASE_PERIOD), f"transform: translateX({fmt(off)}px)"))
-
-    add(0.0, 0.0)
-    for n in range(2):
-        base = 240.0 * n
-        sign = 1.0 if n % 2 == 0 else -1.0
-        add(base + t_start - 0.5, 0.0)
-        t = t_start
-        while t <= t_black + 1e-6:
-            if t <= t_apex:
-                x = (t - t_start) / (t_apex - t_start)
-                val = (1.0 - math.cos(math.pi * x)) / 2.0
-            else:
-                # 下降段用 1 - y^2.2：亮度压得住，直到贴近山脊才迅速收成黑盘。
-                # 天顶处斜率为 0（不突兀），末端斜率不为 0，但那会儿它已经沉到山后了。
-                y = min((t - t_apex) / (t_black - t_apex), 1.0)
-                val = 1.0 - y ** 2.2
-            add(base + t, sign * 94.0 * val)
-            t += 1.0
-        add(base + t_black, 0.0)
-        add(base + moon_b, 0.0)
-    add(PHASE_PERIOD, 0.0)
-    return "\n".join(f"      {p}% {{ {d} }}" for p, d in steps)
+    for t in range(0, int(PHASE_PERIOD) + 1, 2):
+        val = (1.0 + math.cos(2.0 * math.pi * (t - MOON_APEX) / 240.0)) / 2.0
+        sign = 1.0 if ((t - 50.0) % PHASE_PERIOD) < 240.0 else -1.0
+        steps.append((pct(t, PHASE_PERIOD),
+                      "transform: translateX(%spx)" % fmt(sign * 94.0 * val)))
+    return "\n".join("      %s%% { %s }" % (p, d) for p, d in steps)
 
 
 SUN_PERIOD = 2160.0    # 太阳的弧线要跨 9 次过境，才能做到"只有日食时才在天顶停"
@@ -339,6 +321,35 @@ EXTRA_DEFS = """
     <filter id="holyGlow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur stdDeviation="7" result="b"/>
       <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- 和 #copper 同色，但钉死在用户坐标上：阴影扫过时颜色不会跟着滑块跑 -->
+    <radialGradient id="copperU" cx="870.6" cy="107.1" r="66.2" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EE9468"/>
+      <stop offset="0.45" stop-color="#C2552F"/>
+      <stop offset="0.8" stop-color="#8E2E1E"/>
+      <stop offset="1" stop-color="#5C1913"/>
+    </radialGradient>
+    <!-- 月全食时月亮周围的光晕：平时那圈是冷紫的，红月亮配冷光晕对不上 -->
+    <radialGradient id="glowRed" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FFA575" stop-opacity="0.72"/>
+      <stop offset="0.40" stop-color="#D2542F" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#8E2A1C" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="wispGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#E6FFE0" stop-opacity="0.95"/>
+      <stop offset="0.28" stop-color="#7CFF9E" stop-opacity="0.72"/>
+      <stop offset="0.62" stop-color="#35C46A" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#1E8A46" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 血月把夜空与地面染红的"加色"光：以天顶月亮为中心，screen 混合，只在地影全食时亮起 -->
+    <radialGradient id="eclBloodGrad" cx="484" cy="92" r="660" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF4A22" stop-opacity="0.50"/>
+      <stop offset="0.34" stop-color="#D62A14" stop-opacity="0.26"/>
+      <stop offset="0.68" stop-color="#7E160A" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#3A0A06" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="eclSoft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.6"/>
     </filter>
     <radialGradient id="blaze" cx="0.5" cy="0.5" r="0.5">
       <stop offset="0" stop-color="#FFFDF2" stop-opacity="0.95"/>
@@ -573,6 +584,76 @@ def main():
         if r:
             dstyle = replace_kf(dstyle, nm, remap_block(r[2]))
 
+    # ---- 暗版：夜行生物统一对齐到月食窗口
+    # 原来是 128s 时间轴上零散的两段，重映射到 240s 之后各自为政：
+    # 狼人 130s 就变了身（那时月亮才刚升起）、吸血鬼 143s 冒出来又缩回去，
+    # 和月食（150-202s）完全错位。这里整段重排成一条连贯的夜戏。
+    def _rows(rows):
+        # 全部按 960s 的月食周期换算，并在末尾补 100%：
+        # 否则最后一个关键帧落在 25% 附近，剩下四分之三的时间会被浏览器按
+        # "计算值"插值，循环接缝处会跳一下。
+        pairs = [(pct(t, ECL), d) for t, d in rows]
+        if not pairs or pairs[-1][0] != "100":
+            pairs.append(("100", rows[-1][1]))
+        return "\n" + "\n".join("      %s%% { %s }" % (p, d) for p, d in pairs) + "\n    "
+
+    NIGHT_RETIME = {
+        # 地面裂缝：月食前裂开，结束后合上
+        "crackShow": [(0, "opacity: 0"), (148, "opacity: 0"), (151, "opacity: 1"),
+                      (203, "opacity: 1"), (206, "opacity: 0"), (240, "opacity: 0")],
+        # 棺材升起 → 停留 → 沉回
+        "coffinRise": [(0, "transform: translateY(34px)"), (150, "transform: translateY(34px)"),
+                       (154, "transform: translateY(0px)"), (200, "transform: translateY(0px)"),
+                       (204, "transform: translateY(34px)"), (240, "transform: translateY(34px)")],
+        # 棺盖掀开 → 合上
+        "lidOpen": [(0, "transform: translate(0, 0) rotate(0deg)"),
+                    (155, "transform: translate(0, 0) rotate(0deg)"),
+                    (158, "transform: translate(-3.2px, 0px) rotate(-30deg) scaleX(.42)"),
+                    (196, "transform: translate(-3.2px, 0px) rotate(-30deg) scaleX(.42)"),
+                    (199, "transform: translate(0, 0) rotate(0deg)"),
+                    (240, "transform: translate(0, 0) rotate(0deg)")],
+        # 蝙蝠飞出
+        "emergeBatFly": [(0, "transform: translate(0,0); opacity: 0"),
+                         (157, "transform: translate(0,0); opacity: 0"),
+                         (157.8, "transform: translate(0,0); opacity: 1"),
+                         (159, "transform: translate(-7px, -15px); opacity: 1"),
+                         (160.5, "transform: translate(-16px, -26px); opacity: 0"),
+                         (240, "transform: translate(-16px, -26px); opacity: 0")],
+        # 吸血鬼：在场，全食时抬头、举杯
+        "vampShow2": [(0, "opacity: 0"), (160, "opacity: 0"), (163, "opacity: 1"),
+                      (196, "opacity: 1"), (199, "opacity: 0"), (240, "opacity: 0")],
+        "vampGrow": [(0, "transform: scale(.42)"), (160, "transform: scale(.42)"),
+                     (163, "transform: scale(1)"), (196, "transform: scale(1)"),
+                     (199, "transform: scale(.42)"), (240, "transform: scale(.42)")],
+        "vampHeadTilt": [(0, "transform: rotate(0deg)"), (170, "transform: rotate(0deg)"),
+                         (172, "transform: rotate(-11deg)"), (178, "transform: rotate(-11deg)"),
+                         (181, "transform: rotate(0deg)"), (240, "transform: rotate(0deg)")],
+        "vampArmSwing": [(0, "transform: translate(0,0) rotate(0deg)"),
+                         (170, "transform: translate(0,0) rotate(0deg)"),
+                         (172, "transform: translate(5px, 4.6px) rotate(10deg)"),
+                         (178, "transform: translate(5px, 4.6px) rotate(10deg)"),
+                         (181, "transform: translate(0,0) rotate(0deg)"),
+                         (240, "transform: translate(0,0) rotate(0deg)")],
+        "vampGobletFly": [(0, "transform: translate(0,0) rotate(0deg); opacity: 1"),
+                          (176, "transform: translate(0,0) rotate(0deg); opacity: 1"),
+                          (178, "transform: translate(9px, -14px) rotate(150deg); opacity: 0"),
+                          (240, "transform: translate(9px, -14px) rotate(150deg); opacity: 0")],
+        # 狼人：只在全食前后变身，其余时间还是狼
+        "wereShow": [(0, "opacity: 0"), (158, "opacity: 0"), (161, "opacity: 1"),
+                     (197, "opacity: 1"), (200, "opacity: 0"), (240, "opacity: 0")],
+        "wolfShow": [(0, "opacity: 1"), (158, "opacity: 1"), (161, "opacity: 0"),
+                     (197, "opacity: 0"), (200, "opacity: 1"), (240, "opacity: 1")],
+        "wolfHowl": [(0, "transform: scale(1, 1)"), (166, "transform: scale(1, 1)"),
+                     (168, "transform: scale(1.03, 1.08)"), (172, "transform: scale(1.04, 1.10)"),
+                     (175, "transform: scale(1, 1)"), (240, "transform: scale(1, 1)")],
+        # 窗火/星光：跟着全食起伏
+        "glowBoost": [(0, "opacity: 0"), (152, "opacity: 0"), (164, "opacity: .85"),
+                      (186, "opacity: .85"), (200, "opacity: 0"), (240, "opacity: 0")],
+    }
+    for nm, rows in NIGHT_RETIME.items():
+        if kf_block(dstyle, nm):
+            dstyle = replace_kf(dstyle, nm, _rows(rows))
+
     # ---- 浅色版：先改 SMIL 时间轴，再做命名空间隔离
     ldefs = ldefs.replace('dur="128s"', 'dur="240s"')
     lbody = lbody.replace('dur="128s"', 'dur="240s"')
@@ -642,15 +723,78 @@ def main():
     lstyle = lstyle.replace("128s", "240s")
 
     # ---- 暗版：月食改成"慢慢变红"
+    NIGHT_CAST = """
+  <!-- 月食夜：坟里飘出幽灵、爬出骨架，林间浮起鬼火 -->
+  <!-- 场景里本来就有三块带红十字的墓碑（x≈752 / 792 / 828），这里不再加墓碑，
+       只补两个被挖开的墓穴，让幽灵和骨架有个"出处"。 -->
+  <g class="graves">
+    <ellipse cx="772" cy="305.2" rx="7.0" ry="2.0" fill="#2C2744"/>
+    <ellipse cx="772" cy="305.5" rx="5.4" ry="1.4" fill="#0A0818"/>
+    <ellipse cx="810" cy="303.4" rx="6.4" ry="1.8" fill="#2C2744"/>
+    <ellipse cx="810" cy="303.7" rx="4.9" ry="1.3" fill="#0A0818"/>
+  </g>
+  <g transform="translate(772,304)">
+    <g class="ghost" opacity="0">
+      <path d="M0 -14 C6.8 -14 11.2 -8.6 11.2 -2.2 L11.2 15 C9.6 12.4 7.9 15 6.0 12.4 C4.1 15 2.3 12.4 0.4 15 C-1.5 12.4 -3.3 15 -5.2 12.4 C-7.1 15 -8.8 12.4 -11.2 15 L-11.2 -2.2 C-11.2 -8.6 -6.8 -14 0 -14 Z"
+            fill="#CFE4FF" opacity="0.42"/>
+      <ellipse cx="-3.9" cy="-5.2" rx="1.5" ry="2.2" fill="#171430" opacity="0.85"/>
+      <ellipse cx="3.9" cy="-5.2" rx="1.5" ry="2.2" fill="#171430" opacity="0.85"/>
+      <ellipse cx="0" cy="-1.2" rx="1.2" ry="1.6" fill="#171430" opacity="0.35"/>
+    </g>
+  </g>
+  <g transform="translate(810,302)">
+    <g class="skel" opacity="0">
+      <circle cx="0" cy="-21" r="3.5" fill="#E7E3F4"/>
+      <rect x="-1.9" y="-18.6" width="3.8" height="2.2" fill="#E7E3F4"/>
+      <circle cx="-1.25" cy="-21.6" r="0.85" fill="#141126"/>
+      <circle cx="1.25" cy="-21.6" r="0.85" fill="#141126"/>
+      <rect x="-0.55" y="-16.6" width="1.1" height="9" fill="#E7E3F4"/>
+      <path d="M-3.8 -15.0 H3.8 M-3.4 -12.8 H3.4 M-3.0 -10.6 H3.0"
+            stroke="#E7E3F4" stroke-width="0.95" fill="none" stroke-linecap="round"/>
+      <path d="M-3.4 -14.6 L-5.8 -9.8 M3.4 -14.6 L5.8 -9.8"
+            stroke="#E7E3F4" stroke-width="0.95" fill="none" stroke-linecap="round"/>
+      <path d="M-1.5 -7.8 L-2.4 -1.0 M1.5 -7.8 L2.4 -1.0"
+            stroke="#E7E3F4" stroke-width="0.95" fill="none" stroke-linecap="round"/>
+    </g>
+  </g>
+  <g class="wispGate">
+    <circle class="wisp wA" cx="378" cy="289" r="2.7" fill="url(#wispGlow)"/>
+    <circle class="wisp wB" cx="452" cy="296" r="2.1" fill="url(#wispGlow)"/>
+    <circle class="wisp wC" cx="524" cy="286" r="2.4" fill="url(#wispGlow)"/>
+    <circle class="wisp wD" cx="906" cy="292" r="2.2" fill="url(#wispGlow)"/>
+    <circle class="wisp wE" cx="978" cy="287" r="2.9" fill="url(#wispGlow)"/>
+  </g>
+"""
+
     dbody = dbody.replace(
         '<g class="wolf" transform="translate(268,304.5) scale(1.0)">',
-        '<g class="dn-night">\n  <g class="wolf" transform="translate(268,304.5) scale(1.0)">', 1)
+        '<g class="dn-night">\n' + NIGHT_CAST + '  <g class="wolf" transform="translate(268,304.5) scale(1.0)">', 1)
     dbody = dbody.replace('\n    <rect class="eclDimM"', '\n  </g>\n    <rect class="eclDimM"', 1)
+
+    # 红月亮不该配一圈冷紫光晕：加一层铜红，只在全食时段亮起
+    dbody = dbody.replace(
+        '<circle cx="878" cy="120" r="46" fill="url(#moon)">',
+        '<circle class="eclGlow" cx="878" cy="120" r="156" fill="url(#glowRed)"/>\n'
+        '  <circle cx="878" cy="120" r="46" fill="url(#moon)">', 1)
+
+    # 压暗层从冷紫改成偏暖：月全食时地面是被暗红光照着的
+    dbody = dbody.replace(
+        '<rect class="eclDimM" width="1200" height="340" fill="#0A0818"/>',
+        '<rect class="eclDimM" width="1200" height="340" fill="#1E0508"/>\n'
+        '  <rect class="eclBlood" width="1200" height="340" fill="url(#eclBloodGrad)"'
+        ' style="mix-blend-mode: screen"/>', 1)
 
     dbody = dbody.replace(
         '<circle class="eclMoon" cx="878" cy="120" r="46" fill="url(#copper)"/>',
         '<circle class="eclMoon" cx="878" cy="120" r="46" fill="url(#copper)" opacity="0"/>',
     )
+    # 月食不是"整块变红"，是一道阴影从一侧扫过去。
+    # 用一块比月盘大的铜色矩形在 moonclip 里平移，被圆裁掉的就是月牙状的阴影边。
+    dbody = dbody.replace(
+        '<circle class="eclMoon" cx="878" cy="120" r="46" fill="url(#copper)" opacity="0"/>',
+        '<circle class="eclSweep" cx="878" cy="120" r="140" fill="url(#copperU)"'
+        ' filter="url(#eclSoft)"/>')
+
     dbody = dbody.replace(
         '<circle class="eclMoon" cx="878" cy="120" r="46" fill="url(#copper)" opacity="0"/>\n  </g>',
         '<circle class="eclMoon" cx="878" cy="120" r="46" fill="url(#copper)" opacity="0"/>\n  </g>\n'
@@ -722,24 +866,32 @@ def main():
     css.append("    }")
     L = LUNATION * 2        # 月食隔一个满月一次
     F = FULL_AT
-    css.append(kfs("eclRed", [
-        ("0", "opacity: 0"),
-        (pct(F - 30, L), "opacity: 0"),
-        (pct(F - 6, L), "opacity: .5"),
-        (pct(F - 2, L), "opacity: 1"),
-        (pct(F + 10, L), "opacity: 1"),
-        (pct(F + 28, L), "opacity: .42"),
-        (pct(F + 42, L), "opacity: 0"),
-        ("100", "opacity: 0"),
+    # 阴影扫过：150s 从左边缘进入，166s 盖满，180s 开始退出，202s 完全离开
+    css.append(kfs("eclSweepMove", [
+        ("0", "transform: translateX(-190px)"),
+        (pct(F - 20, L), "transform: translateX(-190px)"),
+        (pct(F + 32, L), "transform: translateX(192px)"),
+        ("100", "transform: translateX(192px)"),
     ]))
     css.append(kfs("eclSceneDim", [
         ("0", "opacity: 0"),
-        (pct(F - 22, L), "opacity: 0"),
-        (pct(F - 4, L), "opacity: .15"),
-        (pct(F + 10, L), "opacity: .15"),
-        (pct(F + 38, L), "opacity: 0"),
+        (pct(F - 15, L), "opacity: 0"),
+        (pct(F - 6, L), "opacity: .30"),
+        (pct(F + 14, L), "opacity: .30"),
+        (pct(F + 28, L), "opacity: 0"),
         ("100", "opacity: 0"),
     ]))
+    # 血光：以天顶月亮为中心的红色"加色"光，只在地影全食时亮起。
+    # 用 screen 混合，所以是往场景里"添红"，而不是把蓝调地面乘暗成紫。
+    css.append(kfs("eclBloodIn", [
+        ("0", "opacity: 0"),
+        (pct(F - 12, L), "opacity: 0"),
+        (pct(F - 4, L), "opacity: .8"),
+        (pct(F + 14, L), "opacity: .8"),
+        (pct(F + 24, L), "opacity: 0"),
+        ("100", "opacity: 0"),
+    ]))
+    css.append("    .eclBlood { animation: eclBloodIn 960s linear infinite; pointer-events: none }")
     css.append(kfs("moonDimNew", [
         ("0", "opacity: .16"), ("45", "opacity: .16"), ("60", "opacity: .10"),
         ("80", "opacity: .10"), ("95", "opacity: .16"), ("100", "opacity: .16"),
@@ -764,12 +916,12 @@ def main():
     css.append("    .duskBand { animation: duskBand 240s ease-in-out infinite }")
     css.append(kfs("eclDarken", [
         ("0", "opacity: 0"),
-        (pct(F - 30, L), "opacity: 0"),
-        (pct(F - 10, L), "opacity: .12"),
-        (pct(F - 2, L), "opacity: .46"),
-        (pct(F + 10, L), "opacity: .46"),
-        (pct(F + 28, L), "opacity: .12"),
-        (pct(F + 42, L), "opacity: 0"),
+        (pct(F - 20, L), "opacity: 0"),
+        (pct(F - 10, L), "opacity: .16"),
+        (pct(F - 4, L), "opacity: .62"),
+        (pct(F + 10, L), "opacity: .62"),
+        (pct(F + 20, L), "opacity: .16"),
+        (pct(F + 32, L), "opacity: 0"),
         ("100", "opacity: 0"),
     ]))
     css.append("    .mphase { animation: mphaseNew 480s linear infinite }")
@@ -781,7 +933,16 @@ def main():
     css.append("    .l-corona { animation: corona 2160s linear infinite }")
     css.append("    .l-eclDim { animation: eclipseDim 2160s linear infinite; pointer-events: none }")
     css.append("    .eclDark { animation: eclDarken 960s linear infinite }")
-    css.append("    .eclMoon { animation: eclRed 960s linear infinite }")
+    css.append("    .eclSweep { animation: eclSweepMove 960s linear infinite }")
+    css.append(kfs("eclGlowIn", [
+        ("0", "opacity: 0"),
+        (pct(F - 20, L), "opacity: 0"),
+        (pct(F - 7, L), "opacity: .95"),
+        (pct(F + 19, L), "opacity: .95"),
+        (pct(F + 32, L), "opacity: 0"),
+        ("100", "opacity: 0"),
+    ]))
+    css.append("    .eclGlow { animation: eclGlowIn 960s linear infinite }")
     css.append("    .eclDimM { animation: eclSceneDim 960s linear infinite; pointer-events: none }")
     css.append("    .moonDim { animation: moonDimNew 240s linear infinite }")
     css.append(kfs("dnDay", [
@@ -794,6 +955,57 @@ def main():
     ]))
     css.append("    .dn-day { animation: dnDay 240s linear infinite }")
     css.append("    .dn-night { animation: dnNight 240s linear infinite }")
+
+    # 夜行生物整体挂到 960s 的月食时钟：它们只在月全食那一夜出现。
+    # 用 animation-duration 覆盖，保留原来的缓动和循环方式。
+    for _cls in ("wolfhowl", "wolf", "werewolf", "vampHead", "vampArm",
+                 "vampGoblet", "vampGrow", "vamp", "crack", "coffin",
+                 "coffinLid", "emergeBat", "glowBoost"):
+        css.append("    .%s { animation-duration: 960s }" % _cls)
+
+    # ---- 月食夜登场的三个新角色
+    css.append(kfs("ghostDrift", [
+        ("0", "transform: translate(0px, 8px); opacity: 0"),
+        (pct(164, ECL), "transform: translate(0px, 8px); opacity: 0"),
+        (pct(168, ECL), "transform: translate(1px, -10px); opacity: .8"),
+        (pct(174, ECL), "transform: translate(-10px, -24px); opacity: .85"),
+        (pct(182, ECL), "transform: translate(4px, -18px); opacity: .85"),
+        (pct(190, ECL), "transform: translate(-6px, -28px); opacity: .8"),
+        (pct(198, ECL), "transform: translate(2px, -6px); opacity: 0"),
+        ("100", "transform: translate(2px, -6px); opacity: 0"),
+    ]))
+    css.append(kfs("skelCrawl", [
+        ("0", "transform: translate(0px, 18px); opacity: 0"),
+        (pct(166, ECL), "transform: translate(0px, 18px); opacity: 0"),
+        (pct(170, ECL), "transform: translate(-1px, 3px); opacity: .85"),
+        (pct(173, ECL), "transform: translate(-2px, 0px); opacity: .9"),
+        (pct(180, ECL), "transform: translate(-12px, 0px); opacity: .9"),
+        (pct(188, ECL), "transform: translate(-24px, 0px); opacity: .85"),
+        (pct(194, ECL), "transform: translate(-32px, 4px); opacity: .7"),
+        (pct(198, ECL), "transform: translate(-36px, 14px); opacity: 0"),
+        ("100", "transform: translate(-36px, 14px); opacity: 0"),
+    ]))
+    css.append(kfs("wispGate", [
+        ("0", "opacity: 0"), (pct(152, ECL), "opacity: 0"), (pct(156, ECL), "opacity: 1"),
+        (pct(198, ECL), "opacity: 1"), (pct(202, ECL), "opacity: 0"), ("100", "opacity: 0"),
+    ]))
+    css.append(kfs("wispFloat", [
+        ("0", "transform: translate(0px, 0px); opacity: .25"),
+        ("30", "transform: translate(3px, -6px); opacity: 1"),
+        ("60", "transform: translate(-2px, -10px); opacity: .5"),
+        ("85", "transform: translate(-4px, -3px); opacity: .85"),
+        ("100", "transform: translate(0px, 0px); opacity: .25"),
+    ]))
+    # 墓穴开口跟着月食一起出现、一起合上，不整夜敞着
+    css.append("    .graves { animation: crackShow 960s linear infinite }")
+    css.append("    .ghost { animation: ghostDrift 960s linear infinite }")
+    css.append("    .skel { animation: skelCrawl 960s linear infinite }")
+    css.append("    .wispGate { animation: wispGate 960s linear infinite }")
+    css.append("    .wA { animation: wispFloat 5.3s ease-in-out infinite -0.7s }")
+    css.append("    .wB { animation: wispFloat 6.9s ease-in-out infinite -3.1s }")
+    css.append("    .wC { animation: wispFloat 4.7s ease-in-out infinite -2.2s }")
+    css.append("    .wD { animation: wispFloat 7.7s ease-in-out infinite -5.4s }")
+    css.append("    .wE { animation: wispFloat 6.1s ease-in-out infinite -1.3s }")
 
     # 十字架：每次日食都浮现，亮度跟着食分走 —— 全食最盛，半食只是淡淡一道，
     # 日食结束就散。这样不管看到的是哪一次食，天上都有东西。
@@ -848,11 +1060,14 @@ def main():
         "全黑之后隔六秒，第 104 秒月亮就从东边起来了——先是一枚完整的黑新月，"
         "等它整个越过远山、圆盘完整地悬在画面上，相位才开始连续地转："
         "渐渐亮成蛾眉、上弦、凸月，到天顶时正好是满月，再一路亏回新月落下；相邻两次过境明暗左右交替。"
-        "月全食不是每夜都有，隔一个满月才来一次，铜红缓缓浸透月盘再退去。"
+        "月全食不是每夜都有，四个夜里才来一次，铜红缓缓浸透月盘再退去。"
         "日食分三种，轮流出现：正午月亮正对太阳是日全食，从太阳上方掠过是大半食，擦过边缘是小半食。"
         "日食时城堡上空浮起一座发光的十字架，淡金光晕笼住整座城堡：全食最盛，半食只是淡淡一道，食尽即散。"
         "月全食时反过来，城堡上空浮起巨大的血红倒五角星，里面隐约一个黑山羊头，随铜红褪去而消失。"
-        "日月都只在过天顶时减速，升起与落下保持匀速，不做停顿。周期 240 秒，首尾无缝。"
+        "同一夜，坟土裂开，幽灵从墓里浮起，骨架爬出来在林间游荡，树丛间亮起几点绿色鬼火。"
+        "日月都只在过天顶时减速，升起与落下保持匀速，不做停顿。"
+        "昼夜 240 秒一轮，月相 480 秒，月全食 960 秒，日食 2160 秒——"
+        "几条时钟互相错开，整张图要 8640 秒才完全重复。"
     )
 
     out = []
@@ -916,6 +1131,21 @@ def main():
     out.append("  </g>")
     out.append("</svg>")
     svg = "\n".join(out)
+
+    # 清掉被后面规则覆盖掉的旧规则和它们的关键帧。
+    # 这些是历次改版留下的：512s 的旧月食、moonArc/moonFade 的旧写法、
+    # 240s 的旧月相。留着不会出错，但会让人以为它们还在起作用。
+    for dead in (
+        ".eclMoon { animation: lunarEclipse 512s linear infinite }",
+        ".eclDark { animation: eclDarken 960s linear infinite }",
+        ".eclDimM { animation: eclDimM 512s ease-in-out infinite; pointer-events: none }",
+        ".moonArc { animation: moonArc 240s ease-in-out infinite, moonFade 240s ease-in-out infinite }",
+        ".mphase { animation: mphase 240s linear infinite }",
+    ):
+        svg = svg.replace(dead, "")
+    for dead_kf in ("lunarEclipse", "eclDarken", "eclDimM", "moonArc", "moonFade", "mphase"):
+        svg = drop_kf(svg, dead_kf)
+    svg = svg.replace("\n\n\n", "\n\n")
 
     (ASSETS / "banner.svg").write_text(svg, encoding="utf-8", newline="\n")
     print("wrote assets/banner.svg  %.1f KB" % (len(svg.encode("utf-8")) / 1024))

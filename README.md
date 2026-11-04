@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@1e2289ee0e509f26f5a810c15f829c2317472bd6/assets/banner.svg" alt="山野一日" width="100%">
+  <img src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@853d07cebdcb3c5b5d04a37fde167a9c37ac4196/assets/banner.svg" alt="山野一日" width="100%">
 </p>
 
 
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@e82518e6d604fc8b67a777d853ddc2e43987360a/assets/name-dark.svg">
-    <img alt="Charles" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@e82518e6d604fc8b67a777d853ddc2e43987360a/assets/name-light.svg" width="620">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/name-dark.svg">
+    <img alt="Charles" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/name-light.svg" width="620">
   </picture>
 </p>
 
@@ -59,8 +59,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=c7730839">
-    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=c7730839" width="100%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-dark.svg?v=20261101a">
+    <img alt="技术栈" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stack-light.svg?v=20261101a" width="100%">
   </picture>
 </p>
 
@@ -72,8 +72,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-dark.svg?v=4b5c7a38">
-    <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=4b5c7a38">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-dark.svg?v=4e1d1c5a">
+    <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=4e1d1c5a">
   </picture>
 </p>
 
