@@ -72,8 +72,8 @@ Aurora Sprawl 没有地图。可极光本就是太阳的火，穿过一亿五千
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-dark.svg?v=e75f924f">
-    <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=e75f924f">
+    <source media="(prefers-color-scheme: dark)" srcset="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-dark.svg?v=6fc949f6">
+    <img height="165" alt="still moving" src="https://cdn.jsdelivr.net/gh/Charles766/Charles766@main/assets/stats-light.svg?v=6fc949f6">
   </picture>
 </p>
 
